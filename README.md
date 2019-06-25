@@ -19,6 +19,9 @@ The Desinventar dataset and the CRA dataset were open source and could therefore
 
 4.	**Rainfall dataset**  (as replacement for GloFAS dataset): this dataset consists of historical rainfall in mm per day per raster of Uganda.
 
+![alt text](https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/datasets.png)
+
+
 ## Explanation R-code: 
 
 ### Load in rainfall dataset:  
