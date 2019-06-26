@@ -42,3 +42,19 @@ The desinventar dataset and the CRA dataset were open source and could therefore
 
 ![alt text](https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/datasets.png)
 
+## 3. Explanation R-script: 
+
+In this paragraph, I will give a step-by-step explanation of my R-script. In the meantime, I will give some arguments to explain why I made certain decisions.
+
+### Load in rainfall dataset:  
+
+I downloaded the historical rainfall data from 2000 till now by running a Python script. The downloaded data consisted of historical rainfall in mm per day per raster of Uganda. To answer the research question (which is formulated on district-level), I obtained the mean historical rainfall in mm per day per district of Uganda (instead of per raster). 
+
+### Load in desinventar dataset: 
+
+I downloaded the desinventar dataset freely from [here](https://www.desinventar.net/DesInventar/download_base.jsp?countrycode=uga). 
+
+### Load in CRA dataset: 
+
+I downloaded the CRA dataset freely from [here](https://dashboard.510.global/#!/community_risk).
+
