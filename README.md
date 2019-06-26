@@ -18,12 +18,18 @@ In this readme file, I will discuss the following:
 	- Prepare dataset
 	- Examine dataset 
 	- Lasso logistic regression 
+	- Stepwise logistic regression 
 	- Support vector machine (with radial basis kernel)
 	- Random forest 
-	- Stepwise logistic regression 
+
 4. Results 
-5. Future improvements
-6. Presentation 
+	- Lasso logistic regression 
+	- Stepwise logistic regression 
+	- Support vector machine (with radial basis kernel)
+	- Random forest 
+5. Conclusion 	
+6. Future improvements
+7. Presentation 
 
 ## 1. Research question: 
 
@@ -101,6 +107,14 @@ Therefore, I was able to merge the rainfall dataset to the desinventar dataset b
 
 So eventually, I had one ‘final’ dataset (hereinafter referred to as dataset) were each entry was equal to a reported historical flood (in a specific district on a specific date) and for each reported flood several impact-variables of the flood were given (dependent variables), several rainfall-variables of the day and days before the flood were given (independent variable) and several CRA-variables of the district were the flood occurred were given (independent variables). 
 
+### Aggregate floods: 
+
+It appeared that sometimes multiple floods in the same district on the same day or within several days were reported in the desinventar dataset (i.e. by multiple sources). As it is very rare that there occur more floods in the same district within 1 week of time, I decided to aggregate the floods within a district that have a difference in date less than 7 days. 
+
+Before I could do this aggregation, I have performed several steps: First, I have created an extra column named ‘difference’. This column represents for each flood the amount of days between the flood and the next reported flood in the corresponding district. After that, I have made a for-loop that worked as followed: if the amount of days between the flood and the next flood was larger than 7 the original reported date of the flood was kept. But if the amount of days between the flood and the next flood was smaller than 7, the date was set to NA. Subsequently, I replaced all the NA-dates with the first non-NA-date that follows for the corresponding district. To give an example: suppose that there are three reported floods in district Abim, with three different reported dates: 27-09-2011, 28-09-2011 and 30-09-2011. By running the for loop, all reported floods will receive 30-09-2011 as date. 
+
+After I had performed  those steps, I have aggregated all the floods that occurred within the same district and that had the exact same reported date. I did this aggregation by taking the mean of only the non-zero values. I decided to take the mean of only the non-zero values for the following reason: The (from origin) impact variables contained a lot of zero values. It was not clear if those zero’s mean that there was really no impact or that it was not known if there was any impact. As the probability was high that the last reasoning is true, aggregating floods by taking the mean of all values (also the zero values) will give biased results. 
+
 ### Rename and define variables: 
 
 To get a more structured and understandable dataset, I have renamed and defined all the variables in the following way:  
@@ -118,4 +132,86 @@ To get a more structured and understandable dataset, I have renamed and defined 
 	- Variables starting with **CRA_general** are CRA variables that represent the overall hazard, vulnerability, coping capacity and risk scores + some remaining CRA variables that are not part of the risk framework but still relevant (i.e. average elevation, number of displaced persons etc.)
 
 Before I renamed and defined all the variables, I removed all the (from origin) CRA variables ending on ‘0.10’ from the dataset. The reason for this was that it appeared that those variables were a kind of duplicate of the variables not ending on ‘0.10’. The only difference was that the ones ending on ‘0.10’ were scaled variables while the ones not ending on ‘0.10’ were unscaled variables. I removed the scaled ones (ending on ‘0.10’, as I will scale the variables later on by myself together with all the other (not CRA) variables. It's of course unnecessary work to define all those scaled variables when I already know that I am going to remove them anyway. 
+
+### Prepare dataset: 
+
+### Examine dataset: 
+
+### Lasso logistic regression: 
+
+I have used nested 5-fold cross-validation to get estimates of several performance metrics for the lasso logistic regression model. This approach randomly divides the set of observations into five groups, or outer-folds, of approximately equal size. One outer-fold is treated as testset, and the model is trained on the remaining four outer-folds (trainingset). In a lasso logistic regression, the only parameter which you could tune is the lambda parameter. Instead of arbitrarily choosing a lambda value, I did a 10-fold cross-validation to choose the optimal value of the parameter lambda: the outer trainingset (the four outer-folds) were therefore split into ten new inner-folds (one inner fold is treated as validationset and the remaining nine inner-folds are treated as trainingset). Different lambda values (the lambda sequence is chosen by the function ‘glmnet’) are fitted on the (inner) trainingset and the classification error rate of each lambda value is calculated on the (inner) validation set. This is repeated ten times; each time a different inner fold of observations was treated as inner validationset. We then selected the lambda value for which the mean classification error was smallest. The lambda that results in the smallest classification error was used to fit the model on the outer trainingset, and the Area Under the Curve (AUC), the confusion matrix, the accuracy and the F1-score were computed on the outer testset. This whole procedure was repeated five times; each time, a different outer-fold of observations was treated as the testset. So, this process resulted in five estimates of the AUC, the confusion matrix, the accuracy and the F1-score. Each one calculated using (possibly) a different lambda value. An overall estimate of each performance metric was calculated by averaging the 5 values on the particular performance metric. 
+
+![alt text]( https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/nested_crossvalidation.png)
+
+### Stepwise logistic regression: 
+
+I have used 5-fold cross-validation to get estimates of several performance metrics for the stepwise logistic regression model. This approach randomly divides the set of observations into five groups, or outer-folds, of approximately equal size. One outer-fold is treated as testset, and the model is trained on the remaining four outer-folds (trainingset). In a stepwise logistic regression, there are no parameters which you could tune (so we had no nested cross-validaiton). The stepwise logistic regression is fitted on the outer trainingset, and the Area Under the Curve (AUC), the confusion matrix, the accuracy and the F1-score were computed on the outer testset. This whole procedure was repeated five times; each time, a different outer-fold of observations was treated as the testset. So, this process resulted in five estimates of the AUC, the confusion matrix, the accuracy and the F1-score. An overall estimate of each performance metric was calculated by averaging all the 5 values on the particular performance metric. 
+
+### Support vector machine (with radial basis kernel): 
+
+I have used nested 5-fold cross-validation to get estimates of several performance metrics for the support vector machine (with radial basis kernel). This approach randomly divides the set of observations into five groups, or outer-folds, of approximately equal size. One outer-fold is treated as testset, and the model is trained on the remaining four outer-folds (trainingset). In a support vector machine with a radial basis kernel, you can tune two parameters: a cost parameter and a sigma parameter. I have kept the tuning parameter ‘sigma’  constant by the model. However, instead of choosing the default ‘cost’ value, I did a 10-fold cross-validation to choose the optimal value of the cost parameter: the outer trainingset (the four outer-folds) were therefore split into ten new inner-folds (one inner fold is treated as validationset and the remaining nine inner-folds are treated as trainingset). Three different cost values (0.25, 0.5 and 1) are fitted on the (inner) trainingset and the classification error rate of each cost value is calculated on the (inner) validation set. This is repeated ten times; each time a different inner fold of observations was treated as inner validationset. We then selected the cost value for which the mean classification error was smallest. The cost value that results in the smallest classification error was used to fit the model on the outer trainingset, and the Area Under the Curve (AUC), the confusion matrix, the accuracy and the F1-score were computed on the outer testset. This whole procedure was repeated five times; each time, a different outer-fold of observations was treated as the testset. So, this process resulted in five estimates of the AUC, the confusion matrix, the accuracy and the F1-score. Each one calculated using (possibly) a different cost value. An overall estimate of each performance metric was calculated by averaging all the 5 values on the particular performance metric. 
+
+### Random forest: 
+
+I have used 5-fold cross-validation to get estimates of several performance metrics for the random forest model. This approach randomly divides the set of observations into five groups, or outer-folds, of approximately equal size. One outer-fold is treated as testset, and the model is trained on the remaining four outer-folds (trainingset). In a random forest you can tune different parameters: for example, the number of trees (ntree), tree size (maxdepth) and the number of predictor variables used for split selection (mtry). I didn’t tuned the parameters of this model yet (using a nested cross-validation), but just used the default settings of the parameters . So the model (with the default settings) is fitted on the outer trainingset, and the Area Under the Curve (AUC), the confusion matrix, the accuracy and the F1-score were computed on the outer testset. This whole procedure was repeated five times; each time, a different outer-fold of observations was treated as the testset. So, this process resulted in five estimates of the AUC, the confusion matrix, the accuracy and the F1-score. An overall estimate of each performance metric was calculated by averaging all the 5 values on the particular performance metric. 
+
+## 4. Results: 
+I have runned the 4 (above described) models with total impact as dependent variable and the remaining 5 rainfall variables and 12 CRA variables as independent variables. The results of each of the models are reported below: 
+
+### Lasso logistic regression: 
+
+The mean values (mean over five folds) on the performance metrics are as followed for the lasso logistic regression model: 
+- AUC: 0.6812028
+- Accuracy: 0.6683208
+- F1 score: 0.7795317
+- Confusion matrix: 
+
+<i></i>   | Actual: no impact (0) | Actual: impact (1) 
+--- | --- | ---
+**Predicted: no impact (0)** | 9 | 7
+**Predicted: impact (1)** | 32 | 68
+
+### Stepwise logistic regression: 
+
+The mean values (mean over five folds) on the performance metrics are as followed for the stepwise logistic regression model: 
+- AUC: 0.6767306
+- Accuracy: 0.6717991
+- F1 score: 0.7764495
+- Confusion matrix: 
+
+<i></i>   | Actual: no impact (0) | Actual: impact (1) 
+--- | --- | ---
+**Predicted: no impact (0)** | 12 | 9
+**Predicted: impact (1)** | 29 | 66
+
+### Support vector machine (with radial basis kernel):  
+
+The mean values (mean over five folds) on the performance metrics are as followed for the support vector machine (with radial basis kernel):
+- AUC: 0.6337541
+- Accuracy: 0.6787856
+- F1 score: 0.7938131
+- Confusion matrix: 
+
+
+<i></i>   | Actual: no impact (0) | Actual: impact (1) 
+--- | --- | ---
+**Predicted: no impact (0)** | 7 | 3
+**Predicted: impact (1)** | 34 | 72
+
+### Random forest:   
+
+The mean values (mean over five folds) on the performance metrics are as followed for the random forest: 
+- AUC: 0.6465795
+- Accuracy: 0.6424588
+- F1 score: 0.7400836
+- Confusion matrix: 
+
+<i></i>   | Actual: no impact (0) | Actual: impact (1) 
+--- | --- | ---
+**Predicted: no impact (0)** | 15 | 16
+**Predicted: impact (1)** | 26 | 60
+
+
+
+
 
