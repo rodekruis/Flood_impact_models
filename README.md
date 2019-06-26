@@ -48,7 +48,7 @@ In this paragraph, I will give a step-by-step explanation of my R-script. In the
 
 ### Load in rainfall dataset:  
 
-I downloaded the historical rainfall data from 2000 till now by running a Python script. The downloaded data consisted of historical rainfall in mm per day per raster of Uganda. To answer the research question (which is formulated on district-level), I obtained the mean historical rainfall in mm per day per district of Uganda (instead of per raster). 
+I downloaded the historical rainfall data from 2000 till now by running a Python script. The downloaded data consisted of historical rainfall in mm per day per raster of Uganda. To answer the research question (which was formulated on district-level), I obtained the mean historical rainfall in mm per day per district of Uganda (instead of per raster). 
 
 ### Load in desinventar dataset: 
 
@@ -57,4 +57,21 @@ I downloaded the desinventar dataset freely from [here](https://www.desinventar.
 ### Load in CRA dataset: 
 
 I downloaded the CRA dataset freely from [here](https://dashboard.510.global/#!/community_risk).
+
+### Prepare rainfall dataset for merging: 
+
+Before I could merge the rainfall dataset with the other two datasets I had to take the following steps:  
+- The rainfall data had a column with ID numbers, I have renamed this column ‘district’ and changed the ID numbers to the corresponding  uppercase district names. 
+- In the rainfall data a date was written down in the following form ‘chirps.v2.0.2000.01.01’, I have deleted the  ‘chirps.v2.0.’-part and made the dates of class ‘as.Date’ instead of class ‘numeric’. 
+- In the rainfall data the dates were displayed in the columns and the districtnames in the rows. I have transposed this the other way around (i.e. dates were displayed in rows and districts in columns). Afterwards, I reshaped the wide format to a long format, so that each entry was equal to the mean rainfall in a certain district on a certain date (from 2000 till now).
+- I have added 9 extra rainfall columns which might be informative predictors in the later analyses, namely: 
+	- The mean rainfall of one day before 
+	- The mean rainfall of two days before 
+	- The mean rainfall of three days before 
+	- The mean rainfall of four days before 
+	- The mean rainfall of five days before 
+	- The cumulative mean rainfall of the day itself and of one day before 
+	- The cumulative mean rainfall of the day itself and of two days before 
+	- The cumulative mean rainfall of the day itself and of three days before 
+	- The cumulative mean rainfall of the day itself and of four days before 
 
