@@ -60,7 +60,7 @@ I downloaded the CRA dataset freely from [here](https://dashboard.510.global/#!/
 
 ### Prepare rainfall dataset for merging: 
 
-Before I could merge the rainfall dataset with the other two datasets I had to take the following steps:  
+Before I could merge the rainfall dataset with the other two datasets I had taken the following steps:  
 - The rainfall data had a column with ID numbers, I have renamed this column ‘district’ and changed the ID numbers to the corresponding  uppercase district names. 
 - In the rainfall data a date was written down in the following form ‘chirps.v2.0.2000.01.01’, I have deleted the  ‘chirps.v2.0.’-part and made the dates of class ‘as.Date’ instead of class ‘numeric’. 
 - In the rainfall data the dates were displayed in the columns and the districtnames in the rows. I have transposed this the other way around (i.e. dates were displayed in rows and districts in columns). Afterwards, I reshaped the wide format to a long format, so that each entry was equal to the mean rainfall in a certain district on a certain date (from 2000 till now).
@@ -74,4 +74,48 @@ Before I could merge the rainfall dataset with the other two datasets I had to t
 	- The cumulative mean rainfall of the day itself and of two days before 
 	- The cumulative mean rainfall of the day itself and of three days before 
 	- The cumulative mean rainfall of the day itself and of four days before 
+
+ ### Prepare desinventar dataset for merging: 
+
+Before I could merge the desinventar dataset with the other two datasets I had taken the following steps:  
+- I have renamed the column with the (already uppercase) district-names (i.e. admin_level_0_name) ‘district’. 
+- The desinventar dataset consisted of impact data of historical floods and impact data of historical droughts. I have selected only the rows that were flood-related (as my project focusses on historical flood) 
+- The desinventar dataset consisted of some impact data of historical floods that occurred before the year 2000. I have selected only the rows of the historical floods that occurred from 2000 onwards (as my project focusses only on those historical floods).  
+- The desinventar dataset consisted of three columns which represented respectively the year, month and day of the flood, I have added one extra column that represented the date of the flood (combination of the three columns) and have made those dates of class ‘as.Date’. 
+- Some reported dates of floods were not recognized ‘as.Date’ as the day or month of the flood was not given (i.e. ‘00’) and therefore those dates received a NA value. As I needed the dates of the historical floods (because otherwise I couldn’t merge the historical floods to the historical rainfall), I filled in the ‘00’-days and/or months with the day and/or month for which the mean rainfall was highest in the corresponding district. I am of course not sure if those filled in dates are correctly. However, I think this option is better than simply removing all the floods with a ‘00’ day and/or month (as we retained more data now).  
+
+### Prepare CRA dataset for merging: 
+
+Before I could merge the CRA dataset with the other two datasets I have taken the following steps:  
+- I have renamed the column with the district-names (i.e. name) ‘district’ and have made all the district-names uppercase. 
+- I have made all the numeric variables of class ‘numeric’ since they were of class ‘factor’. 
+
+### Merge the three datasets: 
+
+The three datasets were now in such a format that they had at least one common column: 
+- Desinventar dataset had a column named ‘date’ and a column named ‘district’ 
+- Rainfall dataset had a column named ‘date’ and a column named ‘district’  
+- CRA dataset had a column named ‘district’
+
+Therefore, I was able to merge the rainfall dataset to the desinventar dataset by the common columns named ‘date’ and ‘district’. Subsequently, I have merged the CRA dataset to this by the common column called ‘district’. 
+
+So eventually, I had one ‘final’ dataset (hereinafter referred to as dataset) were each entry was equal to a reported historical flood (in a specific district on a specific date) and for each reported flood several impact-variables of the flood were given (dependent variables), several rainfall-variables of the day and days before the flood were given (independent variable) and several CRA-variables of the district were the flood occurred were given (independent variables). 
+
+### Rename and define variables: 
+
+To get a more structured and understandable dataset, I have renamed and defined all the variables in the following way:  
+- Variables starting with **GEN** represent general variables (i.e. the pcode, districtname and date of the historical floods).  
+- Variables staring with **DI** represent the impact variables from the desinventar dataset.  
+	- Variables starting with **DI_people** are impact variables related to people (i.e. amount of deaths, injured etc.) 
+	- Variables starting with **DI_houses** are impact variables related to houses (i.e. amount of houses destroyed and houses damaged etc.) 
+	- Variables starting with **DI_economic** are impact variables related to economics (i.e. amount of damaged crops, amount of lost cattle etc.) 
+	- Variables starting with **DI_infra** are impact variables related to infrastructure (i.e. amount of damaged roads, amount of damaged hospitals etc.) 
+- Variables starting with **RAIN** represent the rainfall variable (and the created rainfall variables, i.e. the cumulative ones) from the rainfall dataset. 
+- Variables starting with **CRA** represent the CRA variables from the CRA dataset.  
+	- Variables starting with **CRA_hazard** are CRA variables related to hazard exposure (i.e. flood exposure, violent incidents last year etc.) 
+ 	- Variables starting with **CRA_vulnerability** are CRA variables related to vulnerability (i.e. poverty incidence, % literacy etc.) 
+	- Variables starting with **CRA_coping** are CRA variables related to coping capacity (i.e. % with mobile access, travel time to nearest city etc.) 
+	- Variables starting with **CRA_general** are CRA variables that represent the overall hazard, vulnerability, coping capacity and risk scores + some remaining CRA variables that are not part of the risk framework but still relevant (i.e. average elevation, number of displaced persons etc.)
+
+Before I renamed and defined all the variables, I removed all the (from origin) CRA variables ending on ‘0.10’ from the dataset. The reason for this was that it appeared that those variables were a kind of duplicate of the variables not ending on ‘0.10’. The only difference was that the ones ending on ‘0.10’ were scaled variables while the ones not ending on ‘0.10’ were unscaled variables. I removed the scaled ones (ending on ‘0.10’, as I will scale the variables later on by myself together with all the other (not CRA) variables. It's of course unnecessary work to define all those scaled variables when I already know that I am going to remove them anyway. 
 
