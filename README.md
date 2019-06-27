@@ -21,8 +21,7 @@ In this readme file, I will discuss the following:
 	- Stepwise logistic regression 
 	- Support vector machine (with radial basis kernel)
 	- Random forest 
-
-4. Results 
+4. Results
 	- Lasso logistic regression 
 	- Stepwise logistic regression 
 	- Support vector machine (with radial basis kernel)
@@ -135,7 +134,27 @@ Before I renamed and defined all the variables, I removed all the (from origin) 
 
 ### Prepare dataset: 
 
+In the beginning, the idea was to make a separate prediction for all the impact variables in the desinventar data. However, after some data exploration (correlations/scatterplots/conditional density plots) it appears that often there was no relationship between an impact-variable and one of the rainfall predictors. This while it was expected that  amount of rainfall should be the most important predictor when predicting flood impact. Therefore, it was already expected by me that no model would be able to predict the separate impact-variables well. To get more feeling of the data, I nevertheless build a multiple linear regression model and extend on that with a zero-inflated Poisson regression, as I read in the literature that this model could be used to model count data with an excess of zero counts (remember: the impact variables contained a lot of zero values). But as expected, both models were not able at all to predict the several impact variables (therefore I removed those lines of codes from the R-script).  
+
+Because of the above mentioned reason, I decided together with 510 to create one ‘total’ binary impact variable (impact yes/no) based on all/some of the impact variables. Subsequently, the idea was to make predictions for this single total impact variable instead of making predictions for all the impact variables separately. 
+
+The desinventar dataset consists of 14 continuous impact variables and 9 binary/categorical impact variables. After several explorations, I decided to use only the 9 binary impact variables for creating a ‘total’ impact variable. I had several reasons for this. First of all, there was a lot more info (filled in/non-zero values) available for the binary variables (and therefore the data quality of those variables seems better) compared with the continuous variables. Second, based on correlations, conditional density plots and scatterplots, the binary variables seem to have a stronger (positive) relationship with the rainfall predictors compared with the continuous variables. Third, all the binary variables were quite highly correlated (which was expected), while they were not highly correlated with the continuous variables and while the continuous variables were not correlated with each other (see plot: health, education, agriculture, industry, aqueduct, sewerage, energy, communication and damaged roads are the 9 binary impact variables).  
+
+![alt text]( https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/correlationmatrix_dependent.png)
+
+I have created the total impact variable as follows: If a case/reported flood has at least one ‘1’ (= impact) on the nine binary impact variables, the flood gets a ‘1’ (= impact) on the total impact variable. If a flood has no ‘1’ on at least one of the nine binary impact variables, the flood gets a ‘0’ (= no impact) on the total impact variable (named ‘DEP_total_affect_binary’ in the dataset). I have removed all the other,  single impact variables from the dataset. 
+
+After visualising the (amount of) missing values in the dataset, I have decided to remove the reported floods of 5 districts (total of 40 floods) as there were no rainfall predictors available for those districts (while the rainfall predictors should be the most important predictors of floodimpact). In addition, I removed two CRA variables as they had more than 85% missing values. There were 12 more CRA variables with any missing values, but the amount of missing values for those variables was less than 5%. I therefore decided not to remove those 12 variables, but to fill in the missing values using mean imputation. 
+
+Furthermore, it appeared that 4 CRA variables had very few unique values (i.e. there were 4 unique values on the variable earthquake exposure, 16 unique values on the variable violent incidents). I decided to remove those variables, as they will probably not be good predictors due to the few amount of unique values. I also decided to remove the CRA variables population density and population as it appeared that the values on those variables were way to high (i.e. population number was sometimes in billions, which is not possible for Uganda). It looks like a comma was missing somewhere in the number. In was not problematic to remove those two variables, as it was not expected that those variables were valuable predictors. 
+
+I have built four statistical models, namely a lasso logistic regression, a stepwise logistic regression, a support vector machine (with a radial basis kernel) and a random forest (more information about the models in the next paragraphs). I have fitted the models with the 10 RAIN variables and the remaining 23 CRA variables as independent variables and the total impact as dependent variable. Subsequently, I have explored which independent variables were seen as most important predictors for flood impact by each of the fitted models. For lasso logistic regression, the variables that were not shrunken to zero by the model were seen as most important. For stepwise logistic regression, the by the model selected variables were seen as most important. For random forest, the variables which provide the highest mean decrease in accuracy and/or the highest mean decrease in Gini were seen as the most important variables. 5 RAIN variables and 11 CRA variables were not seen as important by (most of) the fitted models. Also, when I examined the correlations, scatterplots and conditional density plots, it seems that there were no (or no high) relationships between total impact and each of those 16 independent variables. This again implies, that those variables are probably not important for the prediction of impact. Therefore, I decided to remove those 16 variables from the dataset as well. 
+
+Last but not least, during the data preparation phase I have standardized all the (remaining) independent variables. This means that all variables will have a mean of zero and a standard deviation of one, so that all variables will be on a comparable scale. This way, you avoid the problem that in some models, variables that are measured on a large scale will have more influence on the classifier than variables that are on a small scale. 
+
 ### Examine dataset: 
+
+After the data preparation, the dataset consists of a total impact variable, which is the dependent variable and 5 RAIN variables and 12 CRA variables, which are the independent variables (and 3 general variables which are not going to play a part in the data modelling). To get more feeling of this final dataset, I summarized some descriptive statistics and visualized some correlation matrices, conditional density plots, scatterplots, histograms and boxplots. 
 
 ### Lasso logistic regression: 
 
@@ -156,7 +175,7 @@ I have used nested 5-fold cross-validation to get estimates of several performan
 I have used 5-fold cross-validation to get estimates of several performance metrics for the random forest model. This approach randomly divides the set of observations into five groups, or outer-folds, of approximately equal size. One outer-fold is treated as testset, and the model is trained on the remaining four outer-folds (trainingset). In a random forest you can tune different parameters: for example, the number of trees (ntree), tree size (maxdepth) and the number of predictor variables used for split selection (mtry). I didn’t tuned the parameters of this model yet (using a nested cross-validation), but just used the default settings of the parameters . So the model (with the default settings) is fitted on the outer trainingset, and the Area Under the Curve (AUC), the confusion matrix, the accuracy and the F1-score were computed on the outer testset. This whole procedure was repeated five times; each time, a different outer-fold of observations was treated as the testset. So, this process resulted in five estimates of the AUC, the confusion matrix, the accuracy and the F1-score. An overall estimate of each performance metric was calculated by averaging all the 5 values on the particular performance metric. 
 
 ## 4. Results: 
-I have runned the 4 (above described) models with total impact as dependent variable and the remaining 5 rainfall variables and 12 CRA variables as independent variables. The results of each of the models are reported below: 
+I have runned the 4 (above described) models with total impact as dependent variable and the remaining 5 RAIN variables and 12 CRA variables as independent variables. The results of each of the models are reported below: 
 
 ### Lasso logistic regression: 
 
@@ -192,7 +211,6 @@ The mean values (mean over five folds) on the performance metrics are as followe
 - F1 score: 0.7938131
 - Confusion matrix: 
 
-
 <i></i>   | Actual: no impact (0) | Actual: impact (1) 
 --- | --- | ---
 **Predicted: no impact (0)** | 7 | 3
@@ -210,6 +228,15 @@ The mean values (mean over five folds) on the performance metrics are as followe
 --- | --- | ---
 **Predicted: no impact (0)** | 15 | 16
 **Predicted: impact (1)** | 26 | 60
+
+## 5. Conclusion: 
+
+The results show that the performance of the four models don’t differ very much from each other. However, the AUC of the lasso logistic regression is clearly somewhat higher compared with the other 3 models. As a (lasso) logistic regression is also a model that is quite easy to understand and interpret (especially compared to a support vector machine and a random forest which are black boxes), I decided together with 510 that the lasso logistic regression is (for now) the best model to use when predicting the impact of floods. The model is able to predict impact with 67% accuracy. 
+
+
+
+
+## 6. Future improvements: 
 
 
 
