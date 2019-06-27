@@ -45,7 +45,7 @@ The desinventar dataset and the CRA dataset were open source and could therefore
 
 4.	**Rainfall dataset**  (as replacement for GloFAS dataset): this dataset consists of historical rainfall (from 2000 until now) in mm per day per raster of Uganda.
 
-![alt text](https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/datasets.png)
+![alt text](https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/pictures/datasets.png)
 
 ## 3. Explanation R-script: 
 
@@ -140,7 +140,7 @@ Because of the above mentioned reason, I decided together with 510 to create one
 
 The desinventar dataset consists of 14 continuous impact variables and 9 binary/categorical impact variables. After several explorations, I decided to use only the 9 binary impact variables for creating a ‘total’ impact variable. I had several reasons for this. First of all, there was a lot more info (filled in/non-zero values) available for the binary variables (and therefore the data quality of those variables seems better) compared with the continuous variables. Second, based on correlations, conditional density plots and scatterplots, the binary variables seem to have a stronger (positive) relationship with the rainfall predictors compared with the continuous variables. Third, all the binary variables were quite highly correlated (which was expected), while they were not highly correlated with the continuous variables and while the continuous variables were not correlated with each other (see plot: health, education, agriculture, industry, aqueduct, sewerage, energy, communication and damaged roads are the 9 binary impact variables).  
 
-![alt text]( https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/correlationmatrix_dependent.png)
+![alt text]( https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/pictures/correlationmatrix_dependent.png)
 
 I have created the total impact variable as follows: If a case/reported flood has at least one ‘1’ (= impact) on the nine binary impact variables, the flood gets a ‘1’ (= impact) on the total impact variable. If a flood has no ‘1’ on at least one of the nine binary impact variables, the flood gets a ‘0’ (= no impact) on the total impact variable (named ‘DEP_total_affect_binary’ in the dataset). I have removed all the other,  single impact variables from the dataset. 
 
@@ -160,7 +160,7 @@ After the data preparation, the dataset consists of a total impact variable, whi
 
 I have used nested 5-fold cross-validation to get estimates of several performance metrics for the lasso logistic regression model. This approach randomly divides the set of observations into five groups, or outer-folds, of approximately equal size. One outer-fold is treated as testset, and the model is trained on the remaining four outer-folds (trainingset). In a lasso logistic regression, the only parameter which you could tune is the lambda parameter. Instead of arbitrarily choosing a lambda value, I did a 10-fold cross-validation to choose the optimal value of the parameter lambda: the outer trainingset (the four outer-folds) were therefore split into ten new inner-folds (one inner fold is treated as validationset and the remaining nine inner-folds are treated as trainingset). Different lambda values (the lambda sequence is chosen by the function ‘glmnet’) are fitted on the (inner) trainingset and the classification error rate of each lambda value is calculated on the (inner) validation set. This is repeated ten times; each time a different inner fold of observations was treated as inner validationset. We then selected the lambda value for which the mean classification error was smallest. The lambda that results in the smallest classification error was used to fit the model on the outer trainingset, and the Area Under the Curve (AUC), the confusion matrix, the accuracy and the F1-score were computed on the outer testset. This whole procedure was repeated five times; each time, a different outer-fold of observations was treated as the testset. So, this process resulted in five estimates of the AUC, the confusion matrix, the accuracy and the F1-score. Each one calculated using (possibly) a different lambda value. An overall estimate of each performance metric was calculated by averaging the 5 values on the particular performance metric. 
 
-![alt text]( https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/nested_crossvalidation.png)
+![alt text]( https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/pictures/nested_crossvalidation.png)
 
 ### Stepwise logistic regression: 
 
@@ -180,54 +180,54 @@ I have runned the 4 (above described) models with total impact as dependent vari
 ### Lasso logistic regression: 
 
 The mean values (mean over five folds) on the performance metrics are as followed for the lasso logistic regression model: 
-- AUC: 0.6812028
-- Accuracy: 0.6683208
-- F1 score: 0.7795317
+- AUC: 0.675437
+- Accuracy: 0.6712444
+- F1 score: 0.7795756
 - Confusion matrix: 
 
 <i></i>   | Actual: no impact (0) | Actual: impact (1) 
 --- | --- | ---
-**Predicted: no impact (0)** | 9 | 7
-**Predicted: impact (1)** | 32 | 68
+**Predicted: no impact (0)** | 10 | 7
+**Predicted: impact (1)** | 31 | 67
 
 ### Stepwise logistic regression: 
 
 The mean values (mean over five folds) on the performance metrics are as followed for the stepwise logistic regression model: 
-- AUC: 0.6767306
-- Accuracy: 0.6717991
-- F1 score: 0.7764495
+- AUC: 0.6661027
+- Accuracy: 0.6746927
+- F1 score: 0.7740094
 - Confusion matrix: 
 
 <i></i>   | Actual: no impact (0) | Actual: impact (1) 
 --- | --- | ---
-**Predicted: no impact (0)** | 12 | 9
-**Predicted: impact (1)** | 29 | 66
+**Predicted: no impact (0)** | 13 | 10
+**Predicted: impact (1)** | 28 | 65
 
 ### Support vector machine (with radial basis kernel):  
 
 The mean values (mean over five folds) on the performance metrics are as followed for the support vector machine (with radial basis kernel):
-- AUC: 0.6337541
-- Accuracy: 0.6787856
-- F1 score: 0.7938131
+- AUC: 0.641227
+- Accuracy: 0.6782009
+- F1 score: 0.7944005
 - Confusion matrix: 
 
 <i></i>   | Actual: no impact (0) | Actual: impact (1) 
 --- | --- | ---
-**Predicted: no impact (0)** | 7 | 3
-**Predicted: impact (1)** | 34 | 72
+**Predicted: no impact (0)** | 6 | 3
+**Predicted: impact (1)** | 35 | 72
 
 ### Random forest:   
 
 The mean values (mean over five folds) on the performance metrics are as followed for the random forest: 
-- AUC: 0.6465795
-- Accuracy: 0.6424588
-- F1 score: 0.7400836
+- AUC: 0.6439278
+- Accuracy: 0.6522189
+- F1 score: 0.7480458
 - Confusion matrix: 
 
 <i></i>   | Actual: no impact (0) | Actual: impact (1) 
 --- | --- | ---
-**Predicted: no impact (0)** | 15 | 16
-**Predicted: impact (1)** | 26 | 60
+**Predicted: no impact (0)** | 15 | 15
+**Predicted: impact (1)** | 25 | 60
 
 ## 5. Conclusion: 
 
