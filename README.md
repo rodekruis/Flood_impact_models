@@ -233,10 +233,31 @@ The mean values (mean over five folds) on the performance metrics are as followe
 
 The results show that the performance of the four models don’t differ very much from each other. However, the AUC of the lasso logistic regression is clearly somewhat higher compared with the other 3 models. As a (lasso) logistic regression is also a model that is quite easy to understand and interpret (especially compared to a support vector machine and a random forest which are black boxes), I decided together with 510 that the lasso logistic regression is (for now) the best model to use when predicting the impact of floods. The model is able to predict impact with 67% accuracy. 
 
-
-
+To keep in mind: I have made this conclusion based on comparing the lasso logistic regression which was completely tuned with a support vector machine which was only a bit tuned (only the cost parameter was tuned) and a random forest which was not tuned at all. Therefore, it could be that the random forest or support vector machine would have perform (way) better if I tune those two models (even further). I have written already a code (the lines starting with #) which you have to add to the support vector machine and the random forest to tune the models (even further). 
 
 ## 6. Future improvements: 
+
+- Use the GloFAS dataset instead or in addition to the rainfall dataset or try to find other data which could be useful to predict flood impact. 
+- Use the mean rainfall per catchment area of a district instead of the mean rainfall per district to create the RAIN variables (see elaborate explanation for this at paragraph ‘Extra’s ’. 
+- Try to collect more and/or more accurate impact data. 
+- Create the total impact variable not only based on findings in the data, but also based on expertise knowledge. 
+- Split the total impact variable in for example four impact variables: impact related to people, impact related to houses, impact related to infrastructure and impact related to economics and make separate predictions for those 4 variables (this improvement can only be done after there is collected more and more accurate impact data). 
+- Use a more sophisticated technique to handle the missing values in the dataset, for example multiple imputation. 
+- Select the most important predictor variables not only based on findings in the data, but also based on expertise knowledge. 
+- Try to resample the minority class in the data (impact = 1) so the dataset gets more balanced.  
+- Tune the parameters of the support vector machine (with radial basis kernel)and the parameters of the random forest and see if the lasso logistic regression has still the best model performance.  
+- Make the R-script more reproducible (i.e. that it could be used for other countries as well). 
+
+## 6. Presentation: 
+
+I have presented the entire project during a lunch meeting at 510. You will find the presentation here. 
+
+## 7. Extra code: 
+
+The relationships between the created total impact variable and the different RAIN variables were not as high as was expected. This is possibly also the main reason why the model is not performing very well. At 510, they expected that the model performance would be better if I could take the mean rainfall per catchment area of a district instead of per district and use this rainfall to create the RAIN predictors. A colleague of 510 was therefore assigned to visualise the catchment areas of all the districts of Uganda using Geographic Information System (GIS) analyses. However, as it proved to be more complex and time-consuming than expected for my colleague to visualise the catchment areas, she decided to visualize the catchment areas of only 3 of the 128 districts of Uganda (namely Moyo, Sironko and Soroti). 
+
+
+
 
 
 
