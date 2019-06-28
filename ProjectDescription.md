@@ -262,9 +262,8 @@ The dataset called *data_catchmentRAIN.txt* represents the total impact of each 
 
 It appears that the correlations between the total impact and each RAIN predictors was higher when creating the RAIN predictors using the mean rainfall per catchment area of a district instead of using the mean rainfall per district. (To give you an idea: the correlation between impact and rain_at_day was R = 0.13 vs. R = 0.08, between impact and rain_1_day_before was R = 0.16 vs. R = 0.11, between impact and rain_2_days_before was R = 0.15 vs. R = 0.09, between impact and rain_3_days_before was R = 0.16 vs. R = 0.13 and between impact and Rain_4_days_before was R = 0.16 vs. R = 0.13).  In addition, I have made conditional density plots and scatterplots which again visualize that the relationship between total impact and each RAIN predictor based on mean rainfall per catchment area of a district is quite stronger (see plots): 
 
-
-
-
+![alt text](https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/pictures/relationships_districtRAIN.png)
+![alt text](https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/pictures/relationships_catchmentRAIN.png)
 
 To keep in mind: the relationships are based on floods that occurred in only 3 districts (40 observations). The difference in relationships could of course change when we compare the relationships that are based on the floods in all districts. But based on the results of only those 3 districts, it would probably be better to visualize the catchment areas of all the districts,  create the RAIN predictors based on the mean rainfall per catchment area of the district and use those predictors when predicting total impact of a flood. However, there was nobody at  510 who had sufficient time to visualize all the catchment areas within a short period of time. Therefore, we decided to stick with the old dataset (dataset with RAIN predictors created based on the mean rainfall per district) and we made predictions on this dataset (as described above). 
 
