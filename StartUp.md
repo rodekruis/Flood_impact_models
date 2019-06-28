@@ -7,5 +7,5 @@ Open the R-code you want to run and make sure that your working directory is set
 ```
 setwd("~/GitHub/statistical_floodimpact_uganda")
 ```
- 
+
 You can run the entire code now. Good luck! 
