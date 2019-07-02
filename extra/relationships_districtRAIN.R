@@ -590,6 +590,8 @@ data_agg <- read.delim("processed data/aggregateddataset_correctnames.txt")
 
 #--------------------- Prepare final dataset with 3 districts ------------------
 
+data_agg <- subset(data_agg, GEN_district %in% c("MOYO", "SOROTI", "SIRONKO"))
+
 # Seperate dataframe into dependent and independent variables:
 data_agg_dep <- data_agg[c(1:3, 4:26)]
 data_agg_indep <- data_agg[c(1:3, 27:36)]
