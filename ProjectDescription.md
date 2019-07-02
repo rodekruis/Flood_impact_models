@@ -251,7 +251,7 @@ To keep in mind: I have made this conclusion based on comparing the lasso logist
 
 ## 7. Presentation: 
 
-I have presented the entire project during a lunch meeting at 510. You will find the presentation here. 
+I have presented the entire project during a lunch meeting at 510. You will find the presentation here: https://github.com/rodekruis/statistical_floodimpact_uganda/raw/master/PresentationProject.pdf
 
 ## 8. Extra: 
 
