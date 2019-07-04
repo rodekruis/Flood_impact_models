@@ -165,12 +165,8 @@ data <- DI_uga %>%
   inner_join(rainfall, by = c("district", "date")) %>%
   inner_join(CRA, by = "district")
 
-write.csv(data, "processed_data/mergeddataset.csv", row.names = FALSE)
-
 # Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed_data")
-# write.table(data,file="mergeddataset.txt",sep="\t",row.names = T,col.names = T)
-# setwd("~/GitHub/statistical_floodimpact_uganda")
+write.csv(data, "processed_data/mergeddataset.csv", row.names = FALSE)
 
 data <- read_csv("processed_data/mergeddataset.csv")
 
@@ -178,46 +174,31 @@ data <- read_csv("processed_data/mergeddataset.csv")
 # If floods are reported on dates too close to one another give them the same date (date_NA_filled)
 data <- data %>%
   mutate(difference = difftime(lead(date, default = 999), date, units = "days"),
-         date_NA_filled = if_else((difference2 <= 7 & difference2 >= 0), date(NA), date),
-         date_NA_filled = na.locf(date_NA_filled2, fromLast = TRUE))
+         date_NA_filled = if_else((difference <= 7 & difference >= 0), date(NA), date),
+         date_NA_filled = na.locf(date_NA_filled, fromLast = TRUE))
 
-# Move pcode to the front of the dataset: 
-data <- dplyr::select(data, "pcode", everything())
+
 
 # Remove some variables which I can't aggregate (as they are characters) and don't have to use anymore: 
 data <- dplyr::select(data, -c("serial", "date", "admin_level_0_code", "admin_level_1_code", "admin_level_2_code", 
                                 "admin_level_1_name", "admin_level_2_name", "event", "location", "sources", 
                                 "year", "month", "day", "cause", "magnitude", "latitude", "longitude", 
-                                "comments", "others", "pcode_parent", "difference", "date_NA", "pcode_level2"))
+                                "comments", "others", "pcode_parent", "difference", "pcode_level2"))
 
 # Aggregate the floods in a district which have the same date (mean of filled-in/non-zero values):  
 data_agg <- data %>%
   group_by(pcode, district, date_NA_filled) %>% 
-  summarise_all(funs(mean), na.rm = TRUE)
-
-# Make date as.Date:
-data_agg$date_NA_filled <- as.Date(data_agg$date_NA_filled)
-
-# Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed_data")
-# write.table(data_agg,file="aggregateddataset.txt",sep="\t",row.names = T,col.names = T)
-# setwd("~/GitHub/statistical_floodimpact_uganda")
-data_agg <- read.delim("processed_data/aggregateddataset.txt")
+  summarise_all(funs(mean), na.rm = TRUE) %>%
+  ungroup()
 
 #---------------------------Rename and define all variables---------------------
 
-# Remove variables which have 0-10 in name (standardized variables):   
-data_agg <- dplyr::select(data_agg, -c(Violent.incidents.last.year..0.10., 
-                                       Drought.exposure..0.10., Earthquake.exposure..0.10., Flood.exposure..0.10., 
-                                       X..persons.with.disability..0.10., X..employed..0.10., X..Literacy..0.10., X..having.mosquito.nets..0.10., 
-                                       X..of.orphans.under.18..0.10., Poverty.incidence..0.10., X..permanent.roof.type..0.10., X..Subsistence.farming..0.10., 
-                                       X..permanent.wall.type..0.10., X..Access.to.safe.drinking.water..0.10., Nr..of.educational.facilities.per.10.000.people..0.10., 
-                                       X..Access.to.electricity..0.10., Nr..of.health.facilities.per.10.000.people..0.10., X..Access.improved.sanitation..0.10.,
-                                       Travel.time.to.nearest.city..0.10., X..with.internet.access..0.10., X..with.mobile.access..0.10.))
+# Remove variables which have 0-10 in name (standardized variables):
+data_agg <- dplyr::select(data_agg, -contains('0-10'))
 
-# Rename and define all variables: 
+# Rename all variables:
 data_agg <- data_agg %>%
-  mutate(GEN_pcode = pcode, 
+  dplyr::rename(GEN_pcode = pcode,
          GEN_district = district, 
          GEN_date = date_NA_filled, 
          DI_people_deaths = deaths, 
@@ -226,21 +207,21 @@ data_agg <- data_agg %>%
          DI_people_affected = affected, 
          DI_houses_houses_destroyed = houses_destroyed, 
          DI_houses_houses_damaged = houses_damaged, 
-         DI_economic_losses_loc = losses..loc, 
-         DI_economic_losses_usd = losses..usd, 
+         DI_economic_losses_loc = `losses $loc`,
+         DI_economic_losses_usd = `losses $usd`,
          DI_infra_health = health, 
          DI_infra_education = education, 
          DI_economic_agriculture = agriculture, 
-         DI_infra_industry = industry, 
-         DI_infra_aqueduct = aqueduct, 
-         DI_infra_sewerage = sewerage, 
-         DI_infra_energy = energy, 
-         DI_infra_communication = communication, 
-         DI_infra_damaged_roads =  damaged.roads, 
-         DI_infra_damaged_hospitals = damaged.hospitals, 
-         DI_infra_damaged_education_centers = damaged.education.centers,
-         DI_economic_damaged_crops = damage.in.crops.Ha., 
-         DI_economic_lost_cattle = lost.cattle, 
+         DI_infra_industry = industry,
+         DI_infra_aqueduct = aqueduct,
+         DI_infra_sewerage = sewerage,
+         DI_infra_energy = energy,
+         DI_infra_communication = communication,
+         DI_infra_damaged_roads =  `damaged roads`,
+         DI_infra_damaged_hospitals = `damaged hospitals`,
+         DI_infra_damaged_education_centers = `damaged education centers`,
+         DI_economic_damaged_crops = `damage in crops Ha.`,
+         DI_economic_lost_cattle = `lost cattle`,
          DI_people_evacuated = evacuated, 
          DI_people_relocated = relocated, 
          RAIN_at_day = zero_shifts, 
@@ -253,112 +234,42 @@ data_agg <- data_agg %>%
          RAIN_2days_before_cumulative = rainfall_3days, 
          RAIN_3days_before_cumulative = rainfall_4days, 
          RAIN_4days_before_cumulative = rainfall_5days, 
-         CRA_hazard_violent_incidents = Violent.incidents.last.year, 
-         CRA_vulnerability_disability = X..persons.with.disability, 
-         CRA_coping_drinking_water = X..Access.to.safe.drinking.water, 
-         CRA_coping_educational_facilities= Nr..of.educational.facilities.per.10.000.people, 
-         CRA_coping_electricity = X..Access.to.electricity, 
-         CRA_vulnerability_employed = X..employed, 
-         CRA_hazard_drought_exposure = Drought.exposure, 
-         CRA_hazard_earthquake_exposure = Earthquake.exposure, 
-         CRA_hazard_flood_exposure = Flood.exposure, 
-         CRA_coping_health_facilities = Nr..of.health.facilities.per.10.000.people, 
-         CRA_coping_sanitation = X..Access.improved.sanitation, 
-         CRA_vulnerability_literacy = X..Literacy, 
-         CRA_vulnerability_mosquito_nets = X..having.mosquito.nets, 
-         CRA_vulnerability_orphans = X..of.orphans.under.18, 
-         CRA_vulnerability_poverty = Poverty.incidence, 
-         CRA_vulnerability_roof_type = X..permanent.roof.type, 
-         CRA_vulnerability_subsistence_farming = X..Subsistence.farming, 
-         CRA_coping_time_to_city =  Travel.time.to.nearest.city, 
-         CRA_vulnerability_wall_type = X..permanent.wall.type, 
-         CRA_coping_internet_access = X..with.internet.access, 
-         CRA_coping_mobile_access =  X..with.mobile.access, 
-         CRA_general_land_area = Land.area, 
-         CRA_general_displaced_persons = X..of.displaced.persons, 
-         CRA_general_displaced_local_population = X..of.displaced...local.population, 
-         CRA_general_elevation = Average.elevation, 
-         CRA_general_population_density = Population.density, 
+         CRA_hazard_violent_incidents = `Violent incidents last year`,
+         CRA_vulnerability_disability = `% persons with disability`,
+         CRA_coping_drinking_water = `% Access to safe drinking water`,
+         CRA_coping_educational_facilities = `Nr. of educational facilities per 10,000 people`,
+         CRA_coping_electricity = `% Access to electricity`,
+         CRA_vulnerability_employed = `% employed`,
+         CRA_hazard_drought_exposure = `Drought exposure`,
+         CRA_hazard_earthquake_exposure = `Earthquake exposure`,
+         CRA_hazard_flood_exposure = `Flood exposure`,
+         CRA_coping_health_facilities = `Nr. of health facilities per 10,000 people`,
+         CRA_coping_sanitation = `% Access improved sanitation`,
+         CRA_vulnerability_literacy = `% Literacy`,
+         CRA_vulnerability_mosquito_nets = `% having mosquito nets`,
+         CRA_vulnerability_orphans = `% of orphans under 18`,
+         CRA_vulnerability_poverty = `Poverty incidence`,
+         CRA_vulnerability_roof_type = `% permanent roof type`,
+         CRA_vulnerability_subsistence_farming = `% Subsistence farming`,
+         CRA_coping_time_to_city =  `Travel time to nearest city`,
+         CRA_vulnerability_wall_type = `% permanent wall type`,
+         CRA_coping_internet_access = `% with internet access`,
+         CRA_coping_mobile_access =  `% with mobile access`,
+         CRA_general_land_area = `Land area`,
+         CRA_general_displaced_persons = `# of displaced persons`,
+         CRA_general_displaced_local_population = `# of displaced / local population`,
+         CRA_general_elevation = `Average elevation`,
+         CRA_general_population_density = `Population density`,
          CRA_general_population = Population,
-         CRA_general_coping = Lack.of.Coping.Capacity,
-         CRA_general_risk = Risk.score,
-         CRA_general_hazard = Hazards.exposure,
-         CRA_general_vulnerability = Vulnerability) %>%
-  ungroup() %>%
-  dplyr::select(GEN_pcode, 
-                GEN_district, 
-                GEN_date, 
-                DI_people_deaths, 
-                DI_people_injured, 
-                DI_people_missing, 
-                DI_people_affected, 
-                DI_houses_houses_destroyed, 
-                DI_houses_houses_damaged, 
-                DI_economic_losses_loc, 
-                DI_economic_losses_usd, 
-                DI_infra_health, 
-                DI_infra_education, 
-                DI_economic_agriculture, 
-                DI_infra_industry, 
-                DI_infra_aqueduct, 
-                DI_infra_sewerage, 
-                DI_infra_energy, 
-                DI_infra_communication, 
-                DI_infra_damaged_roads, 
-                DI_infra_damaged_hospitals, 
-                DI_infra_damaged_education_centers,
-                DI_economic_damaged_crops, 
-                DI_economic_lost_cattle, 
-                DI_people_evacuated, 
-                DI_people_relocated, 
-                RAIN_at_day, 
-                RAIN_1day_before, 
-                RAIN_2days_before, 
-                RAIN_3days_before, 
-                RAIN_4days_before, 
-                RAIN_5days_before, 
-                RAIN_at_day, 
-                RAIN_1day_before_cumulative, 
-                RAIN_2days_before_cumulative, 
-                RAIN_3days_before_cumulative, 
-                RAIN_4days_before_cumulative, 
-                CRA_hazard_violent_incidents, 
-                CRA_vulnerability_disability, 
-                CRA_coping_drinking_water, 
-                CRA_coping_educational_facilities, 
-                CRA_coping_electricity, 
-                CRA_vulnerability_employed, 
-                CRA_hazard_drought_exposure, 
-                CRA_hazard_earthquake_exposure, 
-                CRA_hazard_flood_exposure, 
-                CRA_coping_health_facilities, 
-                CRA_coping_sanitation, 
-                CRA_vulnerability_literacy, 
-                CRA_vulnerability_mosquito_nets, 
-                CRA_vulnerability_orphans, 
-                CRA_vulnerability_poverty, 
-                CRA_vulnerability_roof_type, 
-                CRA_vulnerability_subsistence_farming, 
-                CRA_coping_time_to_city, 
-                CRA_vulnerability_wall_type, 
-                CRA_coping_internet_access, 
-                CRA_coping_mobile_access, 
-                CRA_general_land_area, 
-                CRA_general_displaced_persons, 
-                CRA_general_displaced_local_population, 
-                CRA_general_elevation, 
-                CRA_general_population_density, 
-                CRA_general_population,
-                CRA_general_coping,
-                CRA_general_risk,
-                CRA_general_hazard, 
-                CRA_general_vulnerability)
+         CRA_general_coping = `Lack of Coping Capacity`,
+         CRA_general_risk = `Risk score`,
+         CRA_general_hazard = `Hazards exposure`,
+         CRA_general_vulnerability = Vulnerability)
 
 # Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed_data")
-# write.table(data_agg,file="aggregateddataset_correctnames.txt",sep="\t",row.names = T,col.names = T)
-# setwd("~/GitHub/statistical_floodimpact_uganda")
-data_agg <- read.delim("processed_data/aggregateddataset_correctnames.txt")
+write.csv(data, "processed_data/aggregateddataset.csv", row.names = FALSE)
+
+data_agg <- read_csv("processed_data/aggregateddataset.csv")
 
 #---------------------- Prepare (and examine) dataset --------------------------
 
