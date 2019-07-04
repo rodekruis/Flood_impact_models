@@ -159,41 +159,27 @@ CRA[4:56] <- data.frame(lapply(CRA[4:56], function(x) as.numeric(as.character(x)
 
 #------------------------ Merge the three datasets -----------------------------
 
-# Merge the three datasets based on district and flooddate: 
-data <- merge(DI_uga, rainfall, by = c('district', 'date'), is.na = FALSE)
-data <- merge(data, CRA, by = 'district')
-data <- data.frame(data, check.names = TRUE)
+# Merge the three datasets based on district and flooddate:
+
+data <- DI_uga %>%
+  inner_join(rainfall, by = c("district", "date")) %>%
+  inner_join(CRA, by = "district")
+
+write.csv(data, "processed_data/mergeddataset.csv", row.names = FALSE)
 
 # Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed data")
+# setwd("~/GitHub/statistical_floodimpact_uganda/processed_data")
 # write.table(data,file="mergeddataset.txt",sep="\t",row.names = T,col.names = T)
 # setwd("~/GitHub/statistical_floodimpact_uganda")
 
-data <- read.delim("processed data/mergeddataset.txt")
+data <- read_csv("processed_data/mergeddataset.csv")
 
 #--------------------------- Aggregate floods ----------------------------------
-
-# Make extra column which represents the difference in date per district:  
-data$difference <- NA
-for (j in 1:nrow(data)) {
-  data$difference[j] <- difftime(data$date[j + 1], data$date[j], units = "days")
-} 
-
-# If difference between two dates of same district is bigger than 7 (1 week),  
-# use the reported date: 
-data$date_NA <- data$date
-for(i in 1:nrow(data)) { 
-  if(data$difference[i] > 7 || data$difference[i] < 0 || is.na(data$difference[i])) { 
-    data$date_NA[i] <- data$date[i] 
-  } 
-# If difference between two dates of same district is smaller than 7 (1 week),  
-# set date to NA: 
-  else { 
-    data$date_NA[i] <- NA}
-} 
-
-# Set the dates with NA equal to the first known date of the district: 
-data$date_NA_filled <- na.locf(data$date_NA, fromLast = TRUE)
+# If floods are reported on dates too close to one another give them the same date (date_NA_filled)
+data <- data %>%
+  mutate(difference = difftime(lead(date, default = 999), date, units = "days"),
+         date_NA_filled = if_else((difference2 <= 7 & difference2 >= 0), date(NA), date),
+         date_NA_filled = na.locf(date_NA_filled2, fromLast = TRUE))
 
 # Move pcode to the front of the dataset: 
 data <- dplyr::select(data, "pcode", everything())
@@ -213,10 +199,10 @@ data_agg <- data %>%
 data_agg$date_NA_filled <- as.Date(data_agg$date_NA_filled)
 
 # Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed data")
+# setwd("~/GitHub/statistical_floodimpact_uganda/processed_data")
 # write.table(data_agg,file="aggregateddataset.txt",sep="\t",row.names = T,col.names = T)
 # setwd("~/GitHub/statistical_floodimpact_uganda")
-data_agg <- read.delim("processed data/aggregateddataset.txt")
+data_agg <- read.delim("processed_data/aggregateddataset.txt")
 
 #---------------------------Rename and define all variables---------------------
 
@@ -369,10 +355,10 @@ data_agg <- data_agg %>%
                 CRA_general_vulnerability)
 
 # Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed data")
+# setwd("~/GitHub/statistical_floodimpact_uganda/processed_data")
 # write.table(data_agg,file="aggregateddataset_correctnames.txt",sep="\t",row.names = T,col.names = T)
 # setwd("~/GitHub/statistical_floodimpact_uganda")
-data_agg <- read.delim("processed data/aggregateddataset_correctnames.txt")
+data_agg <- read.delim("processed_data/aggregateddataset_correctnames.txt")
 
 #---------------------- Prepare (and examine) dataset --------------------------
 
