@@ -14,7 +14,6 @@ library(ncdf4)
 library(reshape2)
 library(rasterVis)
 library(RColorBrewer)
-library(plyr)
 library(utils)
 library(zoo)
 library(dplyr)
@@ -37,21 +36,22 @@ library(corrplot)
 library(visdat)
 library(naniar)
 library(tidyr)
+library(lubridate)
 
 #---------------------- Load in rainfall dataset -------------------------------
 
 # Load in rainfall dataset 
-rainfall <- read.delim("raw data/rainfall.txt")
+rainfall <- read.delim("raw_data/rainfall.txt")
 
 #---------------------- Load in Desinventar dataset ----------------------------
 
 # Load in Desinventar dataset: 
-DI_uga <- read_csv("raw data/DI_uga.csv")
+DI_uga <- read_csv("raw_data/DI_uga.csv")
 
 #------------------------ Load in  CRA dataset ---------------------------------
 
 #Load in Community Risk Assessment dataset: 
-CRA <- read_excel("raw data/CRA Oeganda.xlsx")
+CRA <- read_excel("raw_data/CRA Oeganda.xlsx")
 
 #------------------- Prepare rainfall dataset for merging ----------------------
 
@@ -59,9 +59,9 @@ CRA <- read_excel("raw data/CRA Oeganda.xlsx")
 crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
 
 # Working directory for uganda boundary to read districts: 
-wshade <- readOGR("boundaries/districts.shp",layer="districts") 
+wshade <- readOGR("boundaries/districts.shp",layer = "districts") 
 
-# Define similar projection: 
+# Define similar projection:
 wshade <- spTransform(wshade, crs1)
 
 # Put the names of the districts in rainfall dataset:  
@@ -72,10 +72,10 @@ rainfall <- cbind(rainfall, districtname)
 rainfall$ID <- NULL
 
 # Move 'wshade$name' variable to front of dataset: 
-rainfall <- select(rainfall, "wshade$name", everything())
+rainfall <- dplyr::select(rainfall, "wshade$name", everything())
 
 # Make the districtnames uppercase (needed to merge all datasets together):    
-rainfall[,1]<- toupper(rainfall[,1]) 
+rainfall[,1] <- toupper(rainfall[,1]) 
 
 # Name the column of the districtnames "ID": 
 colnames(rainfall)[1] <- "ID"
@@ -98,49 +98,34 @@ colnames(rainfall)[1] <- "date"
 rainfall$date <- as.Date(rainfall$date, format = "%Y.%m.%d")
 
 # Reshaping wide format to long format: 
-library(tidyr)
 rainfall <- rainfall %>% gather(district, rainfall, MASAKA:BUGWERI)
 
 # Make the numeric variables as.numeric: 
-rainfall[3] <- data.frame(lapply(rainfall[3], function(x) as.numeric(as.character(x))))
+# rainfall[3] <- data.frame(lapply(rainfall[3], function(x) as.numeric(as.character(x))))
 
-# Create extra rainfall variables: 
-names(rainfall)[3] <- "zero_shifts"
-rainfall$one_shift <- NA
-rainfall$two_shifts <- NA
-rainfall$three_shifts <- NA
-rainfall$four_shifts <- NA
-rainfall$five_shifts <- NA 
-
-rainfall[2:899840,4] <- rainfall[1:899839, 3]
-rainfall$rainfall_2days <- rainfall$zero_shifts + rainfall$one_shift
-rainfall[3:899840,5] <- rainfall[1:899838, 3]
-rainfall$rainfall_3days <- rainfall$zero_shifts + rainfall$one_shift + rainfall$two_shifts
-rainfall[4:899840,6] <- rainfall[1:899837, 3]
-rainfall$rainfall_4days <- rainfall$zero_shifts + rainfall$one_shift + rainfall$two_shifts + rainfall$three_shifts
-rainfall[5:899840,7] <- rainfall[1:899836, 3]
-rainfall$rainfall_5days <- rainfall$zero_shifts + rainfall$one_shift + rainfall$two_shifts + rainfall$three_shifts + rainfall$four_shifts
-rainfall[6:899840,8] <- rainfall[1:899835, 3]
+rainfall <- rainfall %>%
+  dplyr::rename(zero_shifts = rainfall) %>%
+  mutate(
+    zero_shifts = as.numeric(zero_shifts),
+    one_shift = lag(zero_shifts, 1),
+    two_shifts = lag(zero_shifts, 2),
+    three_shifts = lag(zero_shifts, 3),
+    four_shifts = lag(zero_shifts, 4),
+    five_shifts = lag(zero_shifts, 5),
+    rainfall_2days = zero_shifts + one_shift,
+    rainfall_3days = rainfall_2days + two_shifts,
+    rainfall_4days = rainfall_3days + three_shifts,
+    rainfall_5days = rainfall_4days + four_shifts
+  )
 
 #----------------------- Prepare Desinventar dataset for merging----------------
 
-# Select only the rows which are flood related: 
-DI_uga <- subset(DI_uga, event == "FLOOD")
-
-# Rename first column "district" (needed to merge all datasets together):
-colnames(DI_uga)[5] <- "district"
-
-# Select only the rows with year equal or above 2000: 
-DI_uga <- filter(DI_uga, year >= 2000) 
-
-# Put the year, month and day of the flood together with a dash between them and call this column date: 
-DI_uga$date <- paste(DI_uga$year,DI_uga$month,DI_uga$day,sep="-")
-
-# Make date as.Date instead of a character: 
-DI_uga$date <- as.Date(DI_uga$date)
-
-# Order dataset based on district and date: 
-DI_uga <- DI_uga[order(DI_uga$district, DI_uga$year, DI_uga$month, DI_uga$day),]
+DI_uga <- DI_uga %>%
+  dplyr::rename(district = admin_level_0_name) %>%
+  filter(event == "FLOOD",
+         year >= 2000) %>%
+  mutate(date = ymd(paste(year, month, day, sep = "-"))) %>%
+  arrange(district, year, month, day)
 
 # Fill in the expected dates of the NA's by comparing the flood-date with the rainfall data:  
 DI_uga[1,23] <- as.Date("2007-07-30")
