@@ -127,147 +127,24 @@ DI_uga <- DI_uga %>%
   mutate(date = ymd(paste(year, month, day, sep = "-"))) %>%
   arrange(district, year, month, day)
 
-# Fill in the expected dates of the NA's by comparing the flood-date with the rainfall data:  
-DI_uga[1,23] <- as.Date("2007-07-30")
-DI_uga[5:8,23] <- as.Date("2012-07-23")
-DI_uga[12,23] <- as.Date("2007-07-30")
-DI_uga[16,23] <- as.Date("2012-11-28")
-DI_uga[17:36,23] <- as.Date("2013-10-09")
-DI_uga[43,23] <- as.Date("2007-07-30")
-DI_uga[44,23] <- as.Date("2007-09-07")
-DI_uga[51:53,23] <- as.Date("2013-05-07")
-DI_uga[62,23] <- as.Date("2007-07-30")
-DI_uga[63:69,23] <- as.Date("2007-07-30")
-DI_uga[70:75,23] <- as.Date("2007-08-10")
-DI_uga[83:84,23] <- as.Date("2007-09-09")
-DI_uga[86,23] <- as.Date("2007-10-22")
-DI_uga[88,23] <- as.Date("2008-08-15")
-DI_uga[97:102,23] <- as.Date("2012-08-27")
-DI_uga[121,23] <- as.Date("2007-07-29")
-DI_uga[125,23] <- as.Date("2007-07-30")
-DI_uga[126,23] <- as.Date("2007-09-07")
-DI_uga[137:138,23] <- as.Date("2013-01-30")
-DI_uga[145:146,23] <- as.Date("2007-07-30")
-DI_uga[147:148,23] <- as.Date("2007-10-22")
-DI_uga[159,23] <- as.Date("2010-10-23")
-DI_uga[160,23] <- as.Date("2012-12-29")
-DI_uga[163,23] <- as.Date("2013-10-29")
-DI_uga[174,23] <- as.Date("2018-03-19")  
-DI_uga[180:181,23] <- as.Date("2005-06-28")
-DI_uga[182,23] <- as.Date("2007-07-30")
-DI_uga[183,23] <- as.Date("2007-09-09")
-DI_uga[187:197,23] <- as.Date("2012-09-02")
-DI_uga[223,23] <- as.Date("2013-03-19")
-DI_uga[234,23] <- as.Date("2013-05-05")
-DI_uga[242,23] <- as.Date("2002-04-11")
-DI_uga[262:269,23] <- as.Date("2010-02-16")
-DI_uga[278:279,23] <- as.Date("2011-02-03")
-DI_uga[280,23] <- as.Date("2011-07-29")
-DI_uga[306,23] <- as.Date("2018-04-04")
-DI_uga[330,23] <- as.Date("2013-04-11")
-DI_uga[332,23] <- as.Date("2007-09-05")
-DI_uga[335,23] <- as.Date("2007-07-03")
-DI_uga[336,23] <- as.Date("2007-07-03")
-DI_uga[337,23] <- as.Date("2007-09-02")
-DI_uga[340:343,23] <- as.Date("2013-09-01")
-DI_uga[349,23] <- as.Date("2014-09-05")
-DI_uga[364,23] <- as.Date("2013-03-01") # no rainfall data 
-DI_uga[366,23] <- as.Date("2014-04-01") # no rainfall data  
-DI_uga[373,23] <- as.Date("2007-07-01") # no rainfall data 
-DI_uga[375,23] <- as.Date("2012-01-01") # no rainfall data 
-DI_uga[376,23] <- as.Date("2012-01-01") # no rainfall data 
-DI_uga[377:385,23] <- as.Date("2012-04-01") # no rainfall data 
-DI_uga[386:387,23] <- as.Date("2012-06-01") # no rainfall data 
-DI_uga[388,23] <- as.Date("2013-04-01") # no rainfall data 
-DI_uga[389:395,23] <- as.Date("2013-06-01") # no rainfall data 
-DI_uga[399:401,23] <- as.Date("2010-01-01") # no rainfall data 
-DI_uga[414,23] <- as.Date("2014-09-01") # no rainfall data 
-DI_uga[454,23] <- as.Date("2012-08-09")
-DI_uga[455:457,23] <- as.Date("2012-09-02")
-DI_uga[459,23] <- as.Date("2014-03-12") 
-DI_uga[497,23] <- as.Date("2012-04-16")
-DI_uga[503,23] <- as.Date("2013-04-12")
-DI_uga[518:520,23] <- as.Date("2013-08-16")
-DI_uga[521:523,23] <- as.Date("2013-04-11")
-DI_uga[529,23] <- as.Date("2013-09-26")
-DI_uga[537,23] <- as.Date("2007-07-30")
-DI_uga[538:539,23] <- as.Date("2007-09-09")
-DI_uga[541,23] <- as.Date("2010-04-22")
-DI_uga[556:557,23] <- as.Date("2013-10-09")
-DI_uga[558,23] <- as.Date("2013-03-30")
-DI_uga[559:561,23] <- as.Date("2013-05-01")
-DI_uga[566,23] <- as.Date("2013-08-16")
-DI_uga[590,23] <- as.Date("2007-01-30")
-DI_uga[591:595,23] <- as.Date("2007-07-30")
-DI_uga[596:598,23] <- as.Date("2007-08-01")
-DI_uga[607,23] <- as.Date("2007-09-09")
-DI_uga[636,23] <- as.Date("2012-08-27")
-DI_uga[638:644,23] <- as.Date("2012-09-02")
-DI_uga[667,23] <- as.Date("2018-04-15")  
-DI_uga[696:707,23] <- as.Date("2002-04-04")
-DI_uga[708:712,23] <- as.Date("2010-02-16")
-DI_uga[713:715,23] <- as.Date("2010-04-17")
-DI_uga[720,23] <- as.Date("2013-04-11")
-DI_uga[777,23] <- as.Date("2007-07-29")
-DI_uga[778,23] <- as.Date("2007-09-11")
-DI_uga[785:786,23] <- as.Date("2013-05-06")
-DI_uga[794,23] <- as.Date("2006-12-30")
-DI_uga[796,23] <- as.Date("2007-07-30")
-DI_uga[799:804,23] <- as.Date("2012-07-25")
-DI_uga[805:806,23] <- as.Date("2013-05-06")
-DI_uga[808,23] <- as.Date("2007-07-30")
-DI_uga[825,23] <- as.Date("2007-07-29")
-DI_uga[826,23] <- as.Date("2013-09-04")
-DI_uga[830,23] <- as.Date("2007-07-30")
-DI_uga[832,23] <- as.Date("2007-09-05")
-DI_uga[841:843,23] <- as.Date("2013-09-09")
-DI_uga[847:848,23] <- as.Date("2013-04-12")
-DI_uga[851:856,23] <- as.Date("2007-07-30")
-DI_uga[858,23] <- as.Date("2010-02-16")
-DI_uga[894,23] <- as.Date("2009-05-12")
-DI_uga[903,23] <- as.Date("2013-04-12")
-DI_uga[910,23] <- as.Date("2010-02-16")
-DI_uga[930,23] <- as.Date("2007-07-30")
-DI_uga[941:946,23] <- as.Date("2012-07-25")
-DI_uga[964,23] <- as.Date("2011-02-01") # no rainfall data 
-DI_uga[980:981,23] <- as.Date("2007-09-04")
-DI_uga[1000,23] <- as.Date("2007-07-30")
-DI_uga[1006:1012,23] <- as.Date("2012-07-23")
-DI_uga[1014:1015,23] <- as.Date("2013-05-06")
-DI_uga[1020,23] <- as.Date("2013-04-11")
-DI_uga[1030:1033,23] <- as.Date("2012-07-25")
-DI_uga[1034,23] <- as.Date("2012-09-02")
-DI_uga[1035:1036,23] <- as.Date("2013-03-26")
-DI_uga[1038:1041,23] <- as.Date("2013-05-06")
-DI_uga[1045,23] <- as.Date("2007-08-03")
-DI_uga[1056,23] <- as.Date("2012-04-15")
-DI_uga[1080:1081,23] <- as.Date("2010-01-01") # no rainfall data 
-DI_uga[1090:1096,23] <- as.Date("2012-05-01") # no rainfall data 
-DI_uga[1101,23] <- as.Date("2013-05-01") # no rainfall data 
-DI_uga[1113,23] <- as.Date("2007-07-30")
-DI_uga[1114,23] <- as.Date("2007-07-30")
-DI_uga[1116,23] <- as.Date("2012-04-18")
-DI_uga[1120:1123,23] <- as.Date("2012-09-02")
-DI_uga[1125,23] <- as.Date("2013-09-01")
-DI_uga[1126,23] <- as.Date("2007-07-30")
-DI_uga[1128,23] <- as.Date("2007-07-30")
-DI_uga[1132,23] <- as.Date("2018-03-18") 
-DI_uga[1135,23] <- as.Date("2012-04-07")
-DI_uga[1147:1156,23] <- as.Date("2012-09-02")
-DI_uga[1159,23] <- as.Date("2013-09-24")
-DI_uga[1164,23] <- as.Date("2007-07-30")
-DI_uga[1168:1177,23] <- as.Date("2007-09-28")
-DI_uga[1199:1200,23] <- as.Date("2013-11-10")
-DI_uga[1233,23] <- as.Date("2012-08-27")
-DI_uga[1236,23] <- as.Date("2013-05-06")
-DI_uga[1237:1241,23] <- as.Date("2013-09-02")
-DI_uga[1292:1294,23] <- as.Date("2013-04-13")
-DI_uga[1295,23] <- as.Date("2013-09-26")
-DI_uga[1310,23] <- as.Date("2012-04-15")
+# Correct missing rainfall as follows
+# 1 check the day of the year-month with maximum rainfall, if it is available set flood date to that date
+# 2 if no rainfall data is available set it the first day of the month
+# Note by Timo: this is Veronique's original method automated, I'd maybe rather throw away the ones with no rainfall data
+max_rainfall <- rainfall %>%
+  mutate(year = year(date),
+         month = month(date)) %>%
+  group_by(year, month) %>%
+  arrange(-zero_shifts) %>%
+  slice(1) %>%
+  dplyr::select(year, month, date) %>%
+  dplyr::rename(max_rain_date = date)
 
-# # The code I used to fill in the expected dates of the NA's by comparing the flood-date with the rainfall data:  
-# test <- rainfall %>% filter(district == "ABIM", date >= "2011-03-01", date <= "2011-05-30")
-# which.max(test$rainfall)
+DI_uga <- DI_uga %>%
+  left_join(max_rainfall, by = c("year", "month")) %>%
+  mutate(date = if_else(is.na(date), max_rain_date, date)) %>%  # Rule 1
+  mutate(date = if_else(is.na(date), ymd(paste(year, month, "1", sep = "-")), date)) %>%  # Rule 2
+  dplyr::select(-max_rain_date)
 
 #-------------------- Prepare CRA dataset for merging --------------------------
 
