@@ -1,8 +1,3 @@
-#------------------------  Set working directory -------------------------------
-
-# Set working directory to the folder where github files are stored: 
-setwd("~/GitHub/statistical_floodimpact_uganda")
-
 #------------------------  Load required packages ------------------------------
 
 # Load required packages: 
@@ -42,77 +37,6 @@ library(corrplot)
 library(visdat)
 library(naniar)
 library(tidyr)
-
-#------------------------ Download rainfall data -------------------------------
-
-## Copy the following script and run it in Python to download the rainfall data: 
-
-# from ftplib import FTP 
-# import os
-# ftp = FTP('ftp.chg.ucsb.edu')
-# ftp.login(user='', passwd = '')
-# #ftp.cwd('/pub/org/chg/products/CHIRPS-2.0/global_daily/netcdf/p05/') 
-# ftp.cwd('/pub/org/chg/products/CHIRPS-2.0/africa_daily/tifs/p05/')
-# 
-# pattern = '.tif.gz' # Replace with your target substring
-# def downloadFiles1(destination):
-#   filelist=ftp.nlst()
-# 
-# for file in filelist:
-#   if pattern in file:
-#   ftp.retrbinary("RETR "+file, open(os.path.join(destination,file),"wb").write)
-# print (file + " downloaded")
-# return
-# dest="C:/Users/User/Documents/GitHub/statistical_floodimpact_uganda/chirpstif" 
-# downloadFiles1(dest)
-# ftp.quit()
-
-#---------------------- Extract rainfall per district --------------------------
-
-## Extract rainfall per district of Uganda:  
-
-# Define projection
-crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
-
-# Define a clip
-clip <- function(raster,shape) {
-  raster_crop<-crop(raster,shape)
-  raster_bsn<-mask(raster_crop,shape) 
-  return (raster_bsn)}
-
-# Working directory for uganda boundary to read districts
-wshade<-readOGR("boundaries/districts.shp",layer="districts") 
-
-# Working directory for uganda boundary to read kenya boundary
-cliper<-readOGR("boundaries/uga_admbnda_adm1_UBOS_v2.shp",layer="uga_admbnda_adm1_UBOS_v2")
-
-# Define similar projection
-
-cliper<- spTransform(cliper, crs1)
-wshade<- spTransform(wshade, crs1) 
-
-# Load list of files 
-setwd("~/GitHub/statistical_floodimpact_uganda/chirpstif")
-ascii_data <- list.files(,pattern=".tif.gz") #List tif files downloaded by the python code
-
-# Clipe files to kenya boundary
-xx<-stack()
-
-# Read each ascii file to a raster and stack it to xx
-for(files in ascii_data){
-  fn<-gunzip(files,skip=TRUE, overwrite=TRUE, remove=FALSE)
-  r2<-raster(fn)
-  x1<-clip(r2,cliper)
-  xx <- stack( xx ,x1 )
-  file.remove(fn)
-}
-# Remove noise from the data
-xx[xx<0] <- NA
-
-# Extract data for each district / you can use different functions here 
-arain <- raster::extract(x = xx,  y = wshade, fun = mean, df=TRUE) 
-
-setwd("~/GitHub/statistical_floodimpact_uganda")
 
 #---------------------- Load in rainfall dataset -------------------------------
 
