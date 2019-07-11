@@ -37,6 +37,7 @@ library(visdat)
 library(naniar)
 library(tidyr)
 library(lubridate)
+library(tidyimpute)
 
 #---------------------- Load in rainfall dataset -------------------------------
 
@@ -317,7 +318,7 @@ data <- dplyr::select(data, -c(CRA_general_displaced_persons, CRA_general_displa
 data <- data %>% drop_na(RAIN_at_day)
 
 # Do mean imputation for every remaining column that has a missing value:
-data <- data %>% mutate_all(.funs = list(~ifelse(is.na(.), mean(., na.rm=TRUE), .)))
+data <- data %>% impute_mean()
 
   # # Variables with few unique values:
 # length(unique(data$CRA_hazard_earthquake_exposure)) # 4/91 unique values 
