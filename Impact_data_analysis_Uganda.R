@@ -174,8 +174,9 @@ data <- read_csv("processed_data/mergeddataset.csv")
 # If floods are reported on dates too close to one another give them the same date (date_NA_filled)
 data <- data %>%
   mutate(difference = difftime(lead(date, default = 999), date, units = "days"),
-         date_NA_filled = if_else((difference <= 7 & difference >= 0), date(NA), date),
-         date_NA_filled = na.locf(date_NA_filled, fromLast = TRUE))
+         date_NA_filled = if_else((difference <= 7 & difference >= 0), date(NA), date))
+
+data$date_NA_filled <- na.locf(data$date_NA_filled, fromLast = TRUE)
 
 
 
@@ -267,7 +268,7 @@ data_agg <- data_agg %>%
          CRA_general_vulnerability = Vulnerability)
 
 # Write data to a file so not every time all the above steps have to be taken:
-write.csv(data, "processed_data/aggregateddataset.csv", row.names = FALSE)
+write.csv(data_agg, "processed_data/aggregateddataset.csv", row.names = FALSE)
 
 data_agg <- read_csv("processed_data/aggregateddataset.csv")
 
@@ -316,11 +317,9 @@ data <- dplyr::select(data, -c(CRA_general_displaced_persons, CRA_general_displa
 data <- data %>% drop_na(RAIN_at_day)
 
 # Do mean imputation for every remaining column that has a missing value:
-for(i in 1:ncol(data)) {
-  data[,i][is.na(data[,i])] <- mean(as.numeric(data[,i]), na.rm = TRUE)
-}
+data <- data %>% mutate_all(.funs = list(~ifelse(is.na(.), mean(., na.rm=TRUE), .)))
 
-# # Variables with few unique values: 
+  # # Variables with few unique values:
 # length(unique(data$CRA_hazard_earthquake_exposure)) # 4/91 unique values 
 # length(unique(data$CRA_hazard_violent_incidents)) #16/91 unique values 
 # length(unique(data$CRA_hazard_flood_exposure)) # 23/91 unique values 
