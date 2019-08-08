@@ -43,6 +43,7 @@ library(tidyimpute)
 
 # Load in rainfall dataset 
 rainfall <- read.delim("raw_data/rainfall.txt")
+rainfall <- read.csv("raw_data/rain_data2.txt")
 
 #---------------------- Load in Desinventar dataset ----------------------------
 
@@ -92,7 +93,7 @@ colnames(rainfall) <- as.character(unlist(rainfall[1,]))
 rainfall <- rainfall[-1, ]
 
 # Make a column with the dates:  
-rainfall <- cbind(rownames(rainfall), data.frame(rainfall, row.names=NULL))
+rainfall <- cbind(rownames(rainfall), data.frame(rainfall, row.names = NULL))
 colnames(rainfall)[1] <- "date"
 
 # Make the date as.Date instead of a factor:

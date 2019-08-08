@@ -5,3 +5,6 @@
 *.Rproj
 *.tif.gz
 .Rproj.user
+*.grd
+*.gri
+*.pdf

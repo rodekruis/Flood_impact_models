@@ -19,6 +19,6 @@ def downloadFiles(destination, cutoff_year=1999, file_pattern='tif.gz'):
 ftp = FTP('ftp.chg.ucsb.edu')
 ftp.login(user='', passwd = '')
 ftp.cwd('/pub/org/chg/products/CHIRPS-2.0/africa_daily/tifs/p05/')
-dest = os.path.join(os.getcwd(), 'raw_data', 'chirps')
+dest = os.path.join(os.getcwd(), '..', 'raw_data', 'chirps')
 downloadFiles(dest)
 ftp.quit()

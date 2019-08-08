@@ -5,6 +5,10 @@ library(tidyr)
 library(readr)
 library(lubridate)
 library(stringr)
+library(readxl)
+library(ggplot2)
+
+catchment = TRUE
 
 #---------------------- Load in self gathered impact data -------------------------------
 impact_data <- read_csv("raw_data/own_impact_data.csv")
@@ -19,26 +23,38 @@ impact_data <- impact_data %>%
 crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
 
 # Load in rainfall dataset 
-rainfall <- read.delim("raw_data/rainfall.txt")
+if (catchment) {
+  rainfall <- read_csv("raw_data/rainfall_catchment.csv")
+  wshade <- readOGR(file.path("shapes", "uganda_catchment", "ug_cat.shp"),layer = "ug_cat")
+  wshade <- spTransform(wshade, crs1)
+  
+  # Put the names of the districts in rainfall dataset:
+  pcodes <- as.data.frame(wshade$N___N___PC)
+  rainfall <- cbind(rainfall, pcodes)
+  
+  # Remove ID from dataset (because now we have pcodes instead): 
+  rainfall$ID <- NULL
+  
+  # Move 'wshade$name' variable to front of dataset: 
+  rainfall <- dplyr::select(rainfall, "wshade$N___N___PC", everything())
+  
+} else {
+  rainfall <- read.delim("raw_data/rainfall.txt")
+  wshade <- readOGR("boundaries/districts.shp",layer = "districts")
+  wshade <- spTransform(wshade, crs1)
+  # Put the names of the districts in rainfall dataset:
+  districtname <- as.data.frame(wshade$name)
+  rainfall <- cbind(rainfall, districtname)
+  
+  # Remove ID from dataset (because now we have districtnames instead): 
+  rainfall$ID <- NULL
+  
+  # Move 'wshade$name' variable to front of dataset: 
+  rainfall <- dplyr::select(rainfall, "wshade$name", everything())
+  # Make the districtnames uppercase (needed to merge all datasets together):    
+  rainfall[,1] <- toupper(rainfall[,1]) 
+}
 
-# Working directory for uganda boundary to read districts: 
-wshade <- readOGR("boundaries/districts.shp",layer = "districts") 
-
-# Define similar projection:
-wshade <- spTransform(wshade, crs1)
-
-# Put the names of the districts in rainfall dataset:  
-districtname <- as.data.frame(wshade$name)
-rainfall <- cbind(rainfall, districtname)
-
-# Remove ID from dataset (because now we have districtnames instead): 
-rainfall$ID <- NULL
-
-# Move 'wshade$name' variable to front of dataset: 
-rainfall <- dplyr::select(rainfall, "wshade$name", everything())
-
-# Make the districtnames uppercase (needed to merge all datasets together):    
-rainfall[,1] <- toupper(rainfall[,1]) 
 
 # Name the column of the districtnames "ID": 
 colnames(rainfall)[1] <- "ID"
@@ -54,14 +70,14 @@ colnames(rainfall) <- as.character(unlist(rainfall[1,]))
 rainfall <- rainfall[-1, ]
 
 # Make a column with the dates:  
-rainfall <- cbind(rownames(rainfall), data.frame(rainfall, row.names=NULL))
-colnames(rainfall)[1] <- "date"
+rainfall <- rainfall_bu %>%
+  mutate(date = seq(as_date("19990101"), by = "day", length.out = nrow(rainfall)))
 
 # Make the date as.Date instead of a factor:
 rainfall$date <- as.Date(rainfall$date, format = "%Y.%m.%d")
 
 # Reshaping wide format to long format: 
-rainfall <- rainfall %>% gather(district, rainfall, MASAKA:BUGWERI)
+rainfall <- rainfall %>% gather(pcode, rainfall, contains('UGA'))
 
 # Make the numeric variables as.numeric: 
 # rainfall[3] <- data.frame(lapply(rainfall[3], function(x) as.numeric(as.character(x))))
@@ -77,10 +93,11 @@ rainfall <- rainfall %>%
     # five_shifts = lag(zero_shifts, 5),
     rainfall_2days = zero_shifts + one_shift,
     rainfall_3days = rainfall_2days + two_shifts,
-    rainfall_4days = rainfall_3days + three_shifts
+    rainfall_4days = rainfall_3days + three_shifts,
+    rainfall_6days = rainfall_4days + lag(zero_shifts, 5),
+    rainfall_9days = rainfall_6days + lag(zero_shifts, 7) + lag(zero_shifts, 8)
     # rainfall_5days = rainfall_4days + four_shifts
   )
-
 
 make_plots <- function(gg_data, district, verbose=FALSE){
   plot_theme <- theme(axis.title.y = element_blank(),
@@ -133,6 +150,14 @@ make_flood_overview_pdf <- function(districts, pdf_name, from_date="20070101", t
     
     plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')    
     
+    n_floods <- impact_data %>% filter(district == !!district) %>% nrow()
+    
+    if (!district %in% rainfall$district & (n_floods > 0)) {
+      text(x = 0.5, y = 0.5, paste(district, "has", n_floods, "flood(s) but no catchment area available"), 
+           cex = 2, col = "black")
+      next()
+    }
+    
     # Break if there is no flood in range
     if (sum(gg_data$flood, na.rm = T) == 0) {
       text(x = 0.5, y = 0.5, paste(district, "has no floods in selected time range"), 
@@ -160,10 +185,18 @@ make_flood_overview_pdf <- function(districts, pdf_name, from_date="20070101", t
   dev.off()
 }
 
+if (catchment) {
+  CRA <- read_excel("raw_data/CRA Oeganda.xlsx")
+  rainfall <- rainfall %>%
+    left_join(CRA %>% dplyr::select(name, pcode), by = "pcode") %>%
+    rename(district = name) %>%
+    mutate(district = toupper(district))
+}
+
 districts <- sort(unique(impact_data$district))
 
-make_flood_overview_pdf(districts, "flood_plots.pdf", verbose = FALSE)
-# make_flood_overview_pdf(districts, "flood_plots_detailed.pdf", verbose = TRUE)
+make_flood_overview_pdf(districts, "output/overview_per_district.pdf", verbose = FALSE)
+make_flood_overview_pdf(districts, "output/overview_per_district_detailed.pdf", verbose = TRUE)
 
 # Temporary solution, in the future we should just rename the lag columns to something sensible
 rain_labels <- read_csv('raw_data/pretty_rain_labels.csv')
@@ -205,7 +238,7 @@ make_zoomed_in_plots <- function(pdf_name){
     # Filter if less than 30 rows because event is more in the future than rainfall data
     if (nrow(rainfall_sub) < 31) {
       plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
-      text(x = 0.5, y = 0.5, paste0(description, "\n", "no weather data available"), 
+      text(x = 0.5, y = 0.5, paste0(description, "\n", "no rain data available"), 
            cex = 3, col = "black")
       next()
     }
@@ -213,14 +246,14 @@ make_zoomed_in_plots <- function(pdf_name){
     # Filter if no weather data available
     if (nrow(rainfall_sub %>% filter(!is.na(zero_shifts))) == 0) {
       plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
-      text(x = 0.5, y = 0.5, paste0(description, "\n", "no weather data available"), 
+      text(x = 0.5, y = 0.5, paste0(description, "\n", "no rain data available"), 
            cex = 3, col = "black")
       next()
     }
-    
+
     # Make plot facetwrapped for each variable
     p <- rainfall_sub %>%
-      dplyr::select(-district, -flood) %>%
+      dplyr::select(-pcode, -district, -flood) %>%
       gather(key = "rain_var", value = "value", -date) %>%
       left_join(rain_labels, by = "rain_var") %>%
       mutate(flood = ifelse(date == flood_date, TRUE, NA)) %>%
@@ -236,4 +269,4 @@ make_zoomed_in_plots <- function(pdf_name){
   dev.off() 
 }
 
-make_zoomed_in_plots("zoomed_in_per_flood.pdf")
+make_zoomed_in_plots("output/zoomed_in_per_flood.pdf")
