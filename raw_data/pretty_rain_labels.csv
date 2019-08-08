@@ -1,0 +1,10 @@
+rain_var,rain_var_pretty
+zero_shifts,0 - same day
+one_shift,1 day before
+two_shifts,2 days before
+three_shifts,3 days before
+rainfall_2days,cum. 2 days
+rainfall_3days,cum. 3 days
+rainfall_4days,cum. 4 days
+rainfall_6days,cum. 6 days
+rainfall_9days,cum. 9 days

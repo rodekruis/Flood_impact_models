@@ -1,8 +1,3 @@
-#------------------------  Set working directory -------------------------------
-
-# Set working directory to the folder where github files are stored: 
-setwd("~/GitHub/statistical_floodimpact_uganda")
-
 #------------------------  Load required packages ------------------------------
 
 # Load required packages: 
@@ -19,7 +14,6 @@ library(ncdf4)
 library(reshape2)
 library(rasterVis)
 library(RColorBrewer)
-library(plyr)
 library(utils)
 library(zoo)
 library(dplyr)
@@ -42,92 +36,24 @@ library(corrplot)
 library(visdat)
 library(naniar)
 library(tidyr)
-
-#------------------------ Download rainfall data -------------------------------
-
-## Copy the following script and run it in Python to download the rainfall data: 
-
-# from ftplib import FTP 
-# import os
-# ftp = FTP('ftp.chg.ucsb.edu')
-# ftp.login(user='', passwd = '')
-# #ftp.cwd('/pub/org/chg/products/CHIRPS-2.0/global_daily/netcdf/p05/') 
-# ftp.cwd('/pub/org/chg/products/CHIRPS-2.0/africa_daily/tifs/p05/')
-# 
-# pattern = '.tif.gz' # Replace with your target substring
-# def downloadFiles1(destination):
-#   filelist=ftp.nlst()
-# 
-# for file in filelist:
-#   if pattern in file:
-#   ftp.retrbinary("RETR "+file, open(os.path.join(destination,file),"wb").write)
-# print (file + " downloaded")
-# return
-# dest="C:/Users/User/Documents/GitHub/statistical_floodimpact_uganda/chirpstif" 
-# downloadFiles1(dest)
-# ftp.quit()
-
-#---------------------- Extract rainfall per district --------------------------
-
-## Extract rainfall per district of Uganda:  
-
-# Define projection
-crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
-
-# Define a clip
-clip <- function(raster,shape) {
-  raster_crop<-crop(raster,shape)
-  raster_bsn<-mask(raster_crop,shape) 
-  return (raster_bsn)}
-
-# Working directory for uganda boundary to read districts
-wshade<-readOGR("boundaries/districts.shp",layer="districts") 
-
-# Working directory for uganda boundary to read kenya boundary
-cliper<-readOGR("boundaries/uga_admbnda_adm1_UBOS_v2.shp",layer="uga_admbnda_adm1_UBOS_v2")
-
-# Define similar projection
-
-cliper<- spTransform(cliper, crs1)
-wshade<- spTransform(wshade, crs1) 
-
-# Load list of files 
-setwd("~/GitHub/statistical_floodimpact_uganda/chirpstif")
-ascii_data <- list.files(,pattern=".tif.gz") #List tif files downloaded by the python code
-
-# Clipe files to kenya boundary
-xx<-stack()
-
-# Read each ascii file to a raster and stack it to xx
-for(files in ascii_data){
-  fn<-gunzip(files,skip=TRUE, overwrite=TRUE, remove=FALSE)
-  r2<-raster(fn)
-  x1<-clip(r2,cliper)
-  xx <- stack( xx ,x1 )
-  file.remove(fn)
-}
-# Remove noise from the data
-xx[xx<0] <- NA
-
-# Extract data for each district / you can use different functions here 
-arain <- raster::extract(x = xx,  y = wshade, fun = mean, df=TRUE) 
-
-setwd("~/GitHub/statistical_floodimpact_uganda")
+library(lubridate)
+library(tidyimpute)
 
 #---------------------- Load in rainfall dataset -------------------------------
 
 # Load in rainfall dataset 
-rainfall <- read.delim("raw data/rainfall.txt")
+rainfall <- read.delim("raw_data/rainfall.txt")
+rainfall <- read.csv("raw_data/rain_data2.txt")
 
 #---------------------- Load in Desinventar dataset ----------------------------
 
 # Load in Desinventar dataset: 
-DI_uga <- read_csv("raw data/DI_uga.csv")
+DI_uga <- read_csv("raw_data/DI_uga.csv")
 
 #------------------------ Load in  CRA dataset ---------------------------------
 
 #Load in Community Risk Assessment dataset: 
-CRA <- read_excel("raw data/CRA Oeganda.xlsx")
+CRA <- read_excel("raw_data/CRA Oeganda.xlsx")
 
 #------------------- Prepare rainfall dataset for merging ----------------------
 
@@ -135,9 +61,9 @@ CRA <- read_excel("raw data/CRA Oeganda.xlsx")
 crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
 
 # Working directory for uganda boundary to read districts: 
-wshade <- readOGR("boundaries/districts.shp",layer="districts") 
+wshade <- readOGR("boundaries/districts.shp",layer = "districts") 
 
-# Define similar projection: 
+# Define similar projection:
 wshade <- spTransform(wshade, crs1)
 
 # Put the names of the districts in rainfall dataset:  
@@ -148,10 +74,10 @@ rainfall <- cbind(rainfall, districtname)
 rainfall$ID <- NULL
 
 # Move 'wshade$name' variable to front of dataset: 
-rainfall <- select(rainfall, "wshade$name", everything())
+rainfall <- dplyr::select(rainfall, "wshade$name", everything())
 
 # Make the districtnames uppercase (needed to merge all datasets together):    
-rainfall[,1]<- toupper(rainfall[,1]) 
+rainfall[,1] <- toupper(rainfall[,1]) 
 
 # Name the column of the districtnames "ID": 
 colnames(rainfall)[1] <- "ID"
@@ -167,198 +93,60 @@ colnames(rainfall) <- as.character(unlist(rainfall[1,]))
 rainfall <- rainfall[-1, ]
 
 # Make a column with the dates:  
-rainfall <- cbind(rownames(rainfall), data.frame(rainfall, row.names=NULL))
+rainfall <- cbind(rownames(rainfall), data.frame(rainfall, row.names = NULL))
 colnames(rainfall)[1] <- "date"
 
 # Make the date as.Date instead of a factor:
 rainfall$date <- as.Date(rainfall$date, format = "%Y.%m.%d")
 
 # Reshaping wide format to long format: 
-library(tidyr)
 rainfall <- rainfall %>% gather(district, rainfall, MASAKA:BUGWERI)
 
 # Make the numeric variables as.numeric: 
-rainfall[3] <- data.frame(lapply(rainfall[3], function(x) as.numeric(as.character(x))))
+# rainfall[3] <- data.frame(lapply(rainfall[3], function(x) as.numeric(as.character(x))))
 
-# Create extra rainfall variables: 
-names(rainfall)[3] <- "zero_shifts"
-rainfall$one_shift <- NA
-rainfall$two_shifts <- NA
-rainfall$three_shifts <- NA
-rainfall$four_shifts <- NA
-rainfall$five_shifts <- NA 
-
-rainfall[2:899840,4] <- rainfall[1:899839, 3]
-rainfall$rainfall_2days <- rainfall$zero_shifts + rainfall$one_shift
-rainfall[3:899840,5] <- rainfall[1:899838, 3]
-rainfall$rainfall_3days <- rainfall$zero_shifts + rainfall$one_shift + rainfall$two_shifts
-rainfall[4:899840,6] <- rainfall[1:899837, 3]
-rainfall$rainfall_4days <- rainfall$zero_shifts + rainfall$one_shift + rainfall$two_shifts + rainfall$three_shifts
-rainfall[5:899840,7] <- rainfall[1:899836, 3]
-rainfall$rainfall_5days <- rainfall$zero_shifts + rainfall$one_shift + rainfall$two_shifts + rainfall$three_shifts + rainfall$four_shifts
-rainfall[6:899840,8] <- rainfall[1:899835, 3]
+rainfall <- rainfall %>%
+  dplyr::rename(zero_shifts = rainfall) %>%
+  mutate(
+    zero_shifts = as.numeric(zero_shifts),
+    one_shift = lag(zero_shifts, 1),
+    two_shifts = lag(zero_shifts, 2),
+    three_shifts = lag(zero_shifts, 3),
+    four_shifts = lag(zero_shifts, 4),
+    five_shifts = lag(zero_shifts, 5),
+    rainfall_2days = zero_shifts + one_shift,
+    rainfall_3days = rainfall_2days + two_shifts,
+    rainfall_4days = rainfall_3days + three_shifts,
+    rainfall_5days = rainfall_4days + four_shifts
+  )
 
 #----------------------- Prepare Desinventar dataset for merging----------------
 
-# Select only the rows which are flood related: 
-DI_uga <- subset(DI_uga, event == "FLOOD")
+DI_uga <- DI_uga %>%
+  dplyr::rename(district = admin_level_0_name) %>%
+  filter(event == "FLOOD",
+         year >= 2000) %>%
+  mutate(date = ymd(paste(year, month, day, sep = "-"))) %>%
+  arrange(district, year, month, day)
 
-# Rename first column "district" (needed to merge all datasets together):
-colnames(DI_uga)[5] <- "district"
+# Correct missing rainfall as follows
+# 1 check the day of the year-month with maximum rainfall, if it is available set flood date to that date
+# 2 if no rainfall data is available set it the first day of the month
+# Note by Timo: this is Veronique's original method automated, I'd maybe rather throw away the ones with no rainfall data
+max_rainfall <- rainfall %>%
+  mutate(year = year(date),
+         month = month(date)) %>%
+  group_by(year, month) %>%
+  arrange(-zero_shifts) %>%
+  slice(1) %>%
+  dplyr::select(year, month, date) %>%
+  dplyr::rename(max_rain_date = date)
 
-# Select only the rows with year equal or above 2000: 
-DI_uga <- filter(DI_uga, year >= 2000) 
-
-# Put the year, month and day of the flood together with a dash between them and call this column date: 
-DI_uga$date <- paste(DI_uga$year,DI_uga$month,DI_uga$day,sep="-")
-
-# Make date as.Date instead of a character: 
-DI_uga$date <- as.Date(DI_uga$date)
-
-# Order dataset based on district and date: 
-DI_uga <- DI_uga[order(DI_uga$district, DI_uga$year, DI_uga$month, DI_uga$day),]
-
-# Fill in the expected dates of the NA's by comparing the flood-date with the rainfall data:  
-DI_uga[1,23] <- as.Date("2007-07-30")
-DI_uga[5:8,23] <- as.Date("2012-07-23")
-DI_uga[12,23] <- as.Date("2007-07-30")
-DI_uga[16,23] <- as.Date("2012-11-28")
-DI_uga[17:36,23] <- as.Date("2013-10-09")
-DI_uga[43,23] <- as.Date("2007-07-30")
-DI_uga[44,23] <- as.Date("2007-09-07")
-DI_uga[51:53,23] <- as.Date("2013-05-07")
-DI_uga[62,23] <- as.Date("2007-07-30")
-DI_uga[63:69,23] <- as.Date("2007-07-30")
-DI_uga[70:75,23] <- as.Date("2007-08-10")
-DI_uga[83:84,23] <- as.Date("2007-09-09")
-DI_uga[86,23] <- as.Date("2007-10-22")
-DI_uga[88,23] <- as.Date("2008-08-15")
-DI_uga[97:102,23] <- as.Date("2012-08-27")
-DI_uga[121,23] <- as.Date("2007-07-29")
-DI_uga[125,23] <- as.Date("2007-07-30")
-DI_uga[126,23] <- as.Date("2007-09-07")
-DI_uga[137:138,23] <- as.Date("2013-01-30")
-DI_uga[145:146,23] <- as.Date("2007-07-30")
-DI_uga[147:148,23] <- as.Date("2007-10-22")
-DI_uga[159,23] <- as.Date("2010-10-23")
-DI_uga[160,23] <- as.Date("2012-12-29")
-DI_uga[163,23] <- as.Date("2013-10-29")
-DI_uga[174,23] <- as.Date("2018-03-19")  
-DI_uga[180:181,23] <- as.Date("2005-06-28")
-DI_uga[182,23] <- as.Date("2007-07-30")
-DI_uga[183,23] <- as.Date("2007-09-09")
-DI_uga[187:197,23] <- as.Date("2012-09-02")
-DI_uga[223,23] <- as.Date("2013-03-19")
-DI_uga[234,23] <- as.Date("2013-05-05")
-DI_uga[242,23] <- as.Date("2002-04-11")
-DI_uga[262:269,23] <- as.Date("2010-02-16")
-DI_uga[278:279,23] <- as.Date("2011-02-03")
-DI_uga[280,23] <- as.Date("2011-07-29")
-DI_uga[306,23] <- as.Date("2018-04-04")
-DI_uga[330,23] <- as.Date("2013-04-11")
-DI_uga[332,23] <- as.Date("2007-09-05")
-DI_uga[335,23] <- as.Date("2007-07-03")
-DI_uga[336,23] <- as.Date("2007-07-03")
-DI_uga[337,23] <- as.Date("2007-09-02")
-DI_uga[340:343,23] <- as.Date("2013-09-01")
-DI_uga[349,23] <- as.Date("2014-09-05")
-DI_uga[364,23] <- as.Date("2013-03-01") # no rainfall data 
-DI_uga[366,23] <- as.Date("2014-04-01") # no rainfall data  
-DI_uga[373,23] <- as.Date("2007-07-01") # no rainfall data 
-DI_uga[375,23] <- as.Date("2012-01-01") # no rainfall data 
-DI_uga[376,23] <- as.Date("2012-01-01") # no rainfall data 
-DI_uga[377:385,23] <- as.Date("2012-04-01") # no rainfall data 
-DI_uga[386:387,23] <- as.Date("2012-06-01") # no rainfall data 
-DI_uga[388,23] <- as.Date("2013-04-01") # no rainfall data 
-DI_uga[389:395,23] <- as.Date("2013-06-01") # no rainfall data 
-DI_uga[399:401,23] <- as.Date("2010-01-01") # no rainfall data 
-DI_uga[414,23] <- as.Date("2014-09-01") # no rainfall data 
-DI_uga[454,23] <- as.Date("2012-08-09")
-DI_uga[455:457,23] <- as.Date("2012-09-02")
-DI_uga[459,23] <- as.Date("2014-03-12") 
-DI_uga[497,23] <- as.Date("2012-04-16")
-DI_uga[503,23] <- as.Date("2013-04-12")
-DI_uga[518:520,23] <- as.Date("2013-08-16")
-DI_uga[521:523,23] <- as.Date("2013-04-11")
-DI_uga[529,23] <- as.Date("2013-09-26")
-DI_uga[537,23] <- as.Date("2007-07-30")
-DI_uga[538:539,23] <- as.Date("2007-09-09")
-DI_uga[541,23] <- as.Date("2010-04-22")
-DI_uga[556:557,23] <- as.Date("2013-10-09")
-DI_uga[558,23] <- as.Date("2013-03-30")
-DI_uga[559:561,23] <- as.Date("2013-05-01")
-DI_uga[566,23] <- as.Date("2013-08-16")
-DI_uga[590,23] <- as.Date("2007-01-30")
-DI_uga[591:595,23] <- as.Date("2007-07-30")
-DI_uga[596:598,23] <- as.Date("2007-08-01")
-DI_uga[607,23] <- as.Date("2007-09-09")
-DI_uga[636,23] <- as.Date("2012-08-27")
-DI_uga[638:644,23] <- as.Date("2012-09-02")
-DI_uga[667,23] <- as.Date("2018-04-15")  
-DI_uga[696:707,23] <- as.Date("2002-04-04")
-DI_uga[708:712,23] <- as.Date("2010-02-16")
-DI_uga[713:715,23] <- as.Date("2010-04-17")
-DI_uga[720,23] <- as.Date("2013-04-11")
-DI_uga[777,23] <- as.Date("2007-07-29")
-DI_uga[778,23] <- as.Date("2007-09-11")
-DI_uga[785:786,23] <- as.Date("2013-05-06")
-DI_uga[794,23] <- as.Date("2006-12-30")
-DI_uga[796,23] <- as.Date("2007-07-30")
-DI_uga[799:804,23] <- as.Date("2012-07-25")
-DI_uga[805:806,23] <- as.Date("2013-05-06")
-DI_uga[808,23] <- as.Date("2007-07-30")
-DI_uga[825,23] <- as.Date("2007-07-29")
-DI_uga[826,23] <- as.Date("2013-09-04")
-DI_uga[830,23] <- as.Date("2007-07-30")
-DI_uga[832,23] <- as.Date("2007-09-05")
-DI_uga[841:843,23] <- as.Date("2013-09-09")
-DI_uga[847:848,23] <- as.Date("2013-04-12")
-DI_uga[851:856,23] <- as.Date("2007-07-30")
-DI_uga[858,23] <- as.Date("2010-02-16")
-DI_uga[894,23] <- as.Date("2009-05-12")
-DI_uga[903,23] <- as.Date("2013-04-12")
-DI_uga[910,23] <- as.Date("2010-02-16")
-DI_uga[930,23] <- as.Date("2007-07-30")
-DI_uga[941:946,23] <- as.Date("2012-07-25")
-DI_uga[964,23] <- as.Date("2011-02-01") # no rainfall data 
-DI_uga[980:981,23] <- as.Date("2007-09-04")
-DI_uga[1000,23] <- as.Date("2007-07-30")
-DI_uga[1006:1012,23] <- as.Date("2012-07-23")
-DI_uga[1014:1015,23] <- as.Date("2013-05-06")
-DI_uga[1020,23] <- as.Date("2013-04-11")
-DI_uga[1030:1033,23] <- as.Date("2012-07-25")
-DI_uga[1034,23] <- as.Date("2012-09-02")
-DI_uga[1035:1036,23] <- as.Date("2013-03-26")
-DI_uga[1038:1041,23] <- as.Date("2013-05-06")
-DI_uga[1045,23] <- as.Date("2007-08-03")
-DI_uga[1056,23] <- as.Date("2012-04-15")
-DI_uga[1080:1081,23] <- as.Date("2010-01-01") # no rainfall data 
-DI_uga[1090:1096,23] <- as.Date("2012-05-01") # no rainfall data 
-DI_uga[1101,23] <- as.Date("2013-05-01") # no rainfall data 
-DI_uga[1113,23] <- as.Date("2007-07-30")
-DI_uga[1114,23] <- as.Date("2007-07-30")
-DI_uga[1116,23] <- as.Date("2012-04-18")
-DI_uga[1120:1123,23] <- as.Date("2012-09-02")
-DI_uga[1125,23] <- as.Date("2013-09-01")
-DI_uga[1126,23] <- as.Date("2007-07-30")
-DI_uga[1128,23] <- as.Date("2007-07-30")
-DI_uga[1132,23] <- as.Date("2018-03-18") 
-DI_uga[1135,23] <- as.Date("2012-04-07")
-DI_uga[1147:1156,23] <- as.Date("2012-09-02")
-DI_uga[1159,23] <- as.Date("2013-09-24")
-DI_uga[1164,23] <- as.Date("2007-07-30")
-DI_uga[1168:1177,23] <- as.Date("2007-09-28")
-DI_uga[1199:1200,23] <- as.Date("2013-11-10")
-DI_uga[1233,23] <- as.Date("2012-08-27")
-DI_uga[1236,23] <- as.Date("2013-05-06")
-DI_uga[1237:1241,23] <- as.Date("2013-09-02")
-DI_uga[1292:1294,23] <- as.Date("2013-04-13")
-DI_uga[1295,23] <- as.Date("2013-09-26")
-DI_uga[1310,23] <- as.Date("2012-04-15")
-
-# # The code I used to fill in the expected dates of the NA's by comparing the flood-date with the rainfall data:  
-# test <- rainfall %>% filter(district == "ABIM", date >= "2011-03-01", date <= "2011-05-30")
-# which.max(test$rainfall)
+DI_uga <- DI_uga %>%
+  left_join(max_rainfall, by = c("year", "month")) %>%
+  mutate(date = if_else(is.na(date), max_rain_date, date)) %>%  # Rule 1
+  mutate(date = if_else(is.na(date), ymd(paste(year, month, "1", sep = "-")), date)) %>%  # Rule 2
+  dplyr::select(-max_rain_date)
 
 #-------------------- Prepare CRA dataset for merging --------------------------
 
@@ -373,79 +161,47 @@ CRA[4:56] <- data.frame(lapply(CRA[4:56], function(x) as.numeric(as.character(x)
 
 #------------------------ Merge the three datasets -----------------------------
 
-# Merge the three datasets based on district and flooddate: 
-data <- merge(DI_uga, rainfall, by = c('district', 'date'), is.na = FALSE)
-data <- merge(data, CRA, by = 'district')
-data <- data.frame(data, check.names = TRUE)
+# Merge the three datasets based on district and flooddate:
+
+data <- DI_uga %>%
+  inner_join(rainfall, by = c("district", "date")) %>%
+  inner_join(CRA, by = "district")
 
 # Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed data")
-# write.table(data,file="mergeddataset.txt",sep="\t",row.names = T,col.names = T)
-# setwd("~/GitHub/statistical_floodimpact_uganda")
+write.csv(data, "processed_data/mergeddataset.csv", row.names = FALSE)
 
-data <- read.delim("processed data/mergeddataset.txt")
+data <- read_csv("processed_data/mergeddataset.csv")
 
 #--------------------------- Aggregate floods ----------------------------------
+# If floods are reported on dates too close to one another give them the same date (date_NA_filled)
+data <- data %>%
+  mutate(difference = difftime(lead(date, default = 999), date, units = "days"),
+         date_NA_filled = if_else((difference <= 7 & difference >= 0), date(NA), date))
 
-# Make extra column which represents the difference in date per district:  
-data$difference <- NA
-for (j in 1:nrow(data)) {
-  data$difference[j] <- difftime(data$date[j + 1], data$date[j], units = "days")
-} 
+data$date_NA_filled <- na.locf(data$date_NA_filled, fromLast = TRUE)
 
-# If difference between two dates of same district is bigger than 7 (1 week),  
-# use the reported date: 
-data$date_NA <- data$date
-for(i in 1:nrow(data)) { 
-  if(data$difference[i] > 7 || data$difference[i] < 0 || is.na(data$difference[i])) { 
-    data$date_NA[i] <- data$date[i] 
-  } 
-# If difference between two dates of same district is smaller than 7 (1 week),  
-# set date to NA: 
-  else { 
-    data$date_NA[i] <- NA}
-} 
 
-# Set the dates with NA equal to the first known date of the district: 
-data$date_NA_filled <- na.locf(data$date_NA, fromLast = TRUE)
-
-# Move pcode to the front of the dataset: 
-data <- dplyr::select(data, "pcode", everything())
 
 # Remove some variables which I can't aggregate (as they are characters) and don't have to use anymore: 
 data <- dplyr::select(data, -c("serial", "date", "admin_level_0_code", "admin_level_1_code", "admin_level_2_code", 
                                 "admin_level_1_name", "admin_level_2_name", "event", "location", "sources", 
                                 "year", "month", "day", "cause", "magnitude", "latitude", "longitude", 
-                                "comments", "others", "pcode_parent", "difference", "date_NA", "pcode_level2"))
+                                "comments", "others", "pcode_parent", "difference", "pcode_level2"))
 
 # Aggregate the floods in a district which have the same date (mean of filled-in/non-zero values):  
 data_agg <- data %>%
   group_by(pcode, district, date_NA_filled) %>% 
-  summarise_all(funs(mean), na.rm = TRUE)
-
-# Make date as.Date:
-data_agg$date_NA_filled <- as.Date(data_agg$date_NA_filled)
-
-# Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed data")
-# write.table(data_agg,file="aggregateddataset.txt",sep="\t",row.names = T,col.names = T)
-# setwd("~/GitHub/statistical_floodimpact_uganda")
-data_agg <- read.delim("processed data/aggregateddataset.txt")
+  summarise_all(funs(mean), na.rm = TRUE) %>%
+  ungroup()
 
 #---------------------------Rename and define all variables---------------------
 
-# Remove variables which have 0-10 in name (standardized variables):   
-data_agg <- dplyr::select(data_agg, -c(Violent.incidents.last.year..0.10., 
-                                       Drought.exposure..0.10., Earthquake.exposure..0.10., Flood.exposure..0.10., 
-                                       X..persons.with.disability..0.10., X..employed..0.10., X..Literacy..0.10., X..having.mosquito.nets..0.10., 
-                                       X..of.orphans.under.18..0.10., Poverty.incidence..0.10., X..permanent.roof.type..0.10., X..Subsistence.farming..0.10., 
-                                       X..permanent.wall.type..0.10., X..Access.to.safe.drinking.water..0.10., Nr..of.educational.facilities.per.10.000.people..0.10., 
-                                       X..Access.to.electricity..0.10., Nr..of.health.facilities.per.10.000.people..0.10., X..Access.improved.sanitation..0.10.,
-                                       Travel.time.to.nearest.city..0.10., X..with.internet.access..0.10., X..with.mobile.access..0.10.))
+# Remove variables which have 0-10 in name (standardized variables):
+data_agg <- dplyr::select(data_agg, -contains('0-10'))
 
-# Rename and define all variables: 
+# Rename all variables:
 data_agg <- data_agg %>%
-  mutate(GEN_pcode = pcode, 
+  dplyr::rename(GEN_pcode = pcode,
          GEN_district = district, 
          GEN_date = date_NA_filled, 
          DI_people_deaths = deaths, 
@@ -454,21 +210,21 @@ data_agg <- data_agg %>%
          DI_people_affected = affected, 
          DI_houses_houses_destroyed = houses_destroyed, 
          DI_houses_houses_damaged = houses_damaged, 
-         DI_economic_losses_loc = losses..loc, 
-         DI_economic_losses_usd = losses..usd, 
+         DI_economic_losses_loc = `losses $loc`,
+         DI_economic_losses_usd = `losses $usd`,
          DI_infra_health = health, 
          DI_infra_education = education, 
          DI_economic_agriculture = agriculture, 
-         DI_infra_industry = industry, 
-         DI_infra_aqueduct = aqueduct, 
-         DI_infra_sewerage = sewerage, 
-         DI_infra_energy = energy, 
-         DI_infra_communication = communication, 
-         DI_infra_damaged_roads =  damaged.roads, 
-         DI_infra_damaged_hospitals = damaged.hospitals, 
-         DI_infra_damaged_education_centers = damaged.education.centers,
-         DI_economic_damaged_crops = damage.in.crops.Ha., 
-         DI_economic_lost_cattle = lost.cattle, 
+         DI_infra_industry = industry,
+         DI_infra_aqueduct = aqueduct,
+         DI_infra_sewerage = sewerage,
+         DI_infra_energy = energy,
+         DI_infra_communication = communication,
+         DI_infra_damaged_roads =  `damaged roads`,
+         DI_infra_damaged_hospitals = `damaged hospitals`,
+         DI_infra_damaged_education_centers = `damaged education centers`,
+         DI_economic_damaged_crops = `damage in crops Ha.`,
+         DI_economic_lost_cattle = `lost cattle`,
          DI_people_evacuated = evacuated, 
          DI_people_relocated = relocated, 
          RAIN_at_day = zero_shifts, 
@@ -481,112 +237,42 @@ data_agg <- data_agg %>%
          RAIN_2days_before_cumulative = rainfall_3days, 
          RAIN_3days_before_cumulative = rainfall_4days, 
          RAIN_4days_before_cumulative = rainfall_5days, 
-         CRA_hazard_violent_incidents = Violent.incidents.last.year, 
-         CRA_vulnerability_disability = X..persons.with.disability, 
-         CRA_coping_drinking_water = X..Access.to.safe.drinking.water, 
-         CRA_coping_educational_facilities= Nr..of.educational.facilities.per.10.000.people, 
-         CRA_coping_electricity = X..Access.to.electricity, 
-         CRA_vulnerability_employed = X..employed, 
-         CRA_hazard_drought_exposure = Drought.exposure, 
-         CRA_hazard_earthquake_exposure = Earthquake.exposure, 
-         CRA_hazard_flood_exposure = Flood.exposure, 
-         CRA_coping_health_facilities = Nr..of.health.facilities.per.10.000.people, 
-         CRA_coping_sanitation = X..Access.improved.sanitation, 
-         CRA_vulnerability_literacy = X..Literacy, 
-         CRA_vulnerability_mosquito_nets = X..having.mosquito.nets, 
-         CRA_vulnerability_orphans = X..of.orphans.under.18, 
-         CRA_vulnerability_poverty = Poverty.incidence, 
-         CRA_vulnerability_roof_type = X..permanent.roof.type, 
-         CRA_vulnerability_subsistence_farming = X..Subsistence.farming, 
-         CRA_coping_time_to_city =  Travel.time.to.nearest.city, 
-         CRA_vulnerability_wall_type = X..permanent.wall.type, 
-         CRA_coping_internet_access = X..with.internet.access, 
-         CRA_coping_mobile_access =  X..with.mobile.access, 
-         CRA_general_land_area = Land.area, 
-         CRA_general_displaced_persons = X..of.displaced.persons, 
-         CRA_general_displaced_local_population = X..of.displaced...local.population, 
-         CRA_general_elevation = Average.elevation, 
-         CRA_general_population_density = Population.density, 
+         CRA_hazard_violent_incidents = `Violent incidents last year`,
+         CRA_vulnerability_disability = `% persons with disability`,
+         CRA_coping_drinking_water = `% Access to safe drinking water`,
+         CRA_coping_educational_facilities = `Nr. of educational facilities per 10,000 people`,
+         CRA_coping_electricity = `% Access to electricity`,
+         CRA_vulnerability_employed = `% employed`,
+         CRA_hazard_drought_exposure = `Drought exposure`,
+         CRA_hazard_earthquake_exposure = `Earthquake exposure`,
+         CRA_hazard_flood_exposure = `Flood exposure`,
+         CRA_coping_health_facilities = `Nr. of health facilities per 10,000 people`,
+         CRA_coping_sanitation = `% Access improved sanitation`,
+         CRA_vulnerability_literacy = `% Literacy`,
+         CRA_vulnerability_mosquito_nets = `% having mosquito nets`,
+         CRA_vulnerability_orphans = `% of orphans under 18`,
+         CRA_vulnerability_poverty = `Poverty incidence`,
+         CRA_vulnerability_roof_type = `% permanent roof type`,
+         CRA_vulnerability_subsistence_farming = `% Subsistence farming`,
+         CRA_coping_time_to_city =  `Travel time to nearest city`,
+         CRA_vulnerability_wall_type = `% permanent wall type`,
+         CRA_coping_internet_access = `% with internet access`,
+         CRA_coping_mobile_access =  `% with mobile access`,
+         CRA_general_land_area = `Land area`,
+         CRA_general_displaced_persons = `# of displaced persons`,
+         CRA_general_displaced_local_population = `# of displaced / local population`,
+         CRA_general_elevation = `Average elevation`,
+         CRA_general_population_density = `Population density`,
          CRA_general_population = Population,
-         CRA_general_coping = Lack.of.Coping.Capacity,
-         CRA_general_risk = Risk.score,
-         CRA_general_hazard = Hazards.exposure,
-         CRA_general_vulnerability = Vulnerability) %>%
-  ungroup() %>%
-  dplyr::select(GEN_pcode, 
-                GEN_district, 
-                GEN_date, 
-                DI_people_deaths, 
-                DI_people_injured, 
-                DI_people_missing, 
-                DI_people_affected, 
-                DI_houses_houses_destroyed, 
-                DI_houses_houses_damaged, 
-                DI_economic_losses_loc, 
-                DI_economic_losses_usd, 
-                DI_infra_health, 
-                DI_infra_education, 
-                DI_economic_agriculture, 
-                DI_infra_industry, 
-                DI_infra_aqueduct, 
-                DI_infra_sewerage, 
-                DI_infra_energy, 
-                DI_infra_communication, 
-                DI_infra_damaged_roads, 
-                DI_infra_damaged_hospitals, 
-                DI_infra_damaged_education_centers,
-                DI_economic_damaged_crops, 
-                DI_economic_lost_cattle, 
-                DI_people_evacuated, 
-                DI_people_relocated, 
-                RAIN_at_day, 
-                RAIN_1day_before, 
-                RAIN_2days_before, 
-                RAIN_3days_before, 
-                RAIN_4days_before, 
-                RAIN_5days_before, 
-                RAIN_at_day, 
-                RAIN_1day_before_cumulative, 
-                RAIN_2days_before_cumulative, 
-                RAIN_3days_before_cumulative, 
-                RAIN_4days_before_cumulative, 
-                CRA_hazard_violent_incidents, 
-                CRA_vulnerability_disability, 
-                CRA_coping_drinking_water, 
-                CRA_coping_educational_facilities, 
-                CRA_coping_electricity, 
-                CRA_vulnerability_employed, 
-                CRA_hazard_drought_exposure, 
-                CRA_hazard_earthquake_exposure, 
-                CRA_hazard_flood_exposure, 
-                CRA_coping_health_facilities, 
-                CRA_coping_sanitation, 
-                CRA_vulnerability_literacy, 
-                CRA_vulnerability_mosquito_nets, 
-                CRA_vulnerability_orphans, 
-                CRA_vulnerability_poverty, 
-                CRA_vulnerability_roof_type, 
-                CRA_vulnerability_subsistence_farming, 
-                CRA_coping_time_to_city, 
-                CRA_vulnerability_wall_type, 
-                CRA_coping_internet_access, 
-                CRA_coping_mobile_access, 
-                CRA_general_land_area, 
-                CRA_general_displaced_persons, 
-                CRA_general_displaced_local_population, 
-                CRA_general_elevation, 
-                CRA_general_population_density, 
-                CRA_general_population,
-                CRA_general_coping,
-                CRA_general_risk,
-                CRA_general_hazard, 
-                CRA_general_vulnerability)
+         CRA_general_coping = `Lack of Coping Capacity`,
+         CRA_general_risk = `Risk score`,
+         CRA_general_hazard = `Hazards exposure`,
+         CRA_general_vulnerability = Vulnerability)
 
 # Write data to a file so not every time all the above steps have to be taken:
-# setwd("~/GitHub/statistical_floodimpact_uganda/processed data")
-# write.table(data_agg,file="aggregateddataset_correctnames.txt",sep="\t",row.names = T,col.names = T)
-# setwd("~/GitHub/statistical_floodimpact_uganda")
-data_agg <- read.delim("processed data/aggregateddataset_correctnames.txt")
+write.csv(data_agg, "processed_data/aggregateddataset.csv", row.names = FALSE)
+
+data_agg <- read_csv("processed_data/aggregateddataset.csv")
 
 #---------------------- Prepare (and examine) dataset --------------------------
 
@@ -633,11 +319,9 @@ data <- dplyr::select(data, -c(CRA_general_displaced_persons, CRA_general_displa
 data <- data %>% drop_na(RAIN_at_day)
 
 # Do mean imputation for every remaining column that has a missing value:
-for(i in 1:ncol(data)) {
-  data[,i][is.na(data[,i])] <- mean(as.numeric(data[,i]), na.rm = TRUE)
-}
+data <- data %>% impute_mean()
 
-# # Variables with few unique values: 
+  # # Variables with few unique values:
 # length(unique(data$CRA_hazard_earthquake_exposure)) # 4/91 unique values 
 # length(unique(data$CRA_hazard_violent_incidents)) #16/91 unique values 
 # length(unique(data$CRA_hazard_flood_exposure)) # 23/91 unique values 
