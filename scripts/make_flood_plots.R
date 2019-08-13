@@ -7,6 +7,7 @@ library(lubridate)
 library(stringr)
 library(readxl)
 library(ggplot2)
+library(zoo)
 
 catchment = TRUE
 
@@ -70,7 +71,7 @@ colnames(rainfall) <- as.character(unlist(rainfall[1,]))
 rainfall <- rainfall[-1, ]
 
 # Make a column with the dates:  
-rainfall <- rainfall_bu %>%
+rainfall <- rainfall %>%
   mutate(date = seq(as_date("19990101"), by = "day", length.out = nrow(rainfall)))
 
 # Make the date as.Date instead of a factor:
@@ -95,8 +96,12 @@ rainfall <- rainfall %>%
     rainfall_3days = rainfall_2days + two_shifts,
     rainfall_4days = rainfall_3days + three_shifts,
     rainfall_6days = rainfall_4days + lag(zero_shifts, 5),
-    rainfall_9days = rainfall_6days + lag(zero_shifts, 7) + lag(zero_shifts, 8)
+    rainfall_9days = rainfall_6days + lag(zero_shifts, 7) + lag(zero_shifts, 8),
     # rainfall_5days = rainfall_4days + four_shifts
+    moving_avg_3 = rollmean(one_shift, 3, fill = NA, align = "right"),
+    moving_avg_5 = rollmean(one_shift, 5, fill = NA, align = "right"),
+    anomaly_avg3 = zero_shifts - moving_avg_3,
+    anomaly_avg5 = zero_shifts - moving_avg_5
   )
 
 make_plots <- function(gg_data, district, verbose=FALSE){
