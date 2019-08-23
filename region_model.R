@@ -3,6 +3,7 @@ library(dplyr)
 
 
 source('scripts/create_rain_data.R')
+source('scripts/prepare_glofas_data.R')
 
 
 # -------------------- Settings -------------------------------
@@ -13,10 +14,10 @@ p_code_column <- "N___N___PC"  # The column in the shapefile containing the pcod
 
 rainfile_path <- file.path("raw_data", "rainfall_catchment.csv")
 produce_new_rainfall_csv <- FALSE
-regions <- c()
+regions <- c("KATAKWI", "KASESE", "KAABONG")  # A vector of districts, e.g. c("KAMPALA", "KASESE"). If the vector is empty, i.e. c(), it takes all regions 
 
 
-# -------------------- Data Extracting -------------------------
+# -------------------- Data Extracting/Loading -------------------------
 
 # Option to (re)produce rainfall csv
 if (produce_new_rainfall_csv) {
@@ -26,11 +27,30 @@ if (produce_new_rainfall_csv) {
 rainfall <- read.csv(rainfile_path) %>%
   mutate(date = as_date(date))
 
+impact_data <- read_csv("raw_data/own_impact_data.csv")
+impact_data <- impact_data %>%
+  mutate(date = as_date(Date),
+         district = str_to_upper(Area),
+         flood = 1) %>% 
+  dplyr::select(-Date, -Area, -link, -`Extra sources`)
+
+
 # -------------------- Mutating, merging and aggregating -------
 rainfall <- create_extra_rainfall_vars(rainfall)
 
 
+# See documentation for regions in settings above
+if (length(regions) != 0) {
+  rainfall <- rainfall %>%
+    filter(district %in% regions)
+}
 
-# Link flood events
+glofas_data <- prep_glofas_data()
+glofas_data <- make_glofas_district_matrix(glofas_data)
 
-# Model
+
+df <- rainfall %>%
+  left_join(impact_data %>% dplyr::select(district, date, flood), by = c('district', 'date')) %>%
+  left_join(glofas_data, by = c("district", "date"))
+
+  

@@ -1,17 +1,8 @@
 library(purrr)
 library(zoo)
 
-# Read glofas files
-glofas_files <- list.files('raw_data/glofas')
-glofas_stations <- str_match(glofas_files, '^(?:[^_]*_){3}([^.]*)')[,2]
-
-glofas_data <- map2_dfr(glofas_files, glofas_stations, function(filename, glofas_station) {
-  suppressMessages(read_csv(file.path('raw_data', 'glofas', filename))) %>%
-    mutate(station = glofas_station)
-})
-
-glofas_data <- glofas_data %>%
-  rename(date = X1)
+# Read and prep glofas files
+glofas_data <- prep_glofas_data()
 
 # Exploratotory analysis
 glofas_data %>%

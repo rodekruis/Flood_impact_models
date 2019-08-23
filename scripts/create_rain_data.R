@@ -75,6 +75,11 @@ extract_rain_data_for_shapes <- function(shapefile_path, layer, rainfile_name, u
     gather("date", "rainfall", -pcode) %>%
     mutate(date = as_date(date))
   
+  CRA <- read_excel("raw_data/CRA Oeganda.xlsx")
+  rainfall <- rainfall %>%
+    left_join(CRA %>% dplyr::select(name, pcode), by = "pcode") %>%
+    rename(district = name) %>%
+    mutate(district = toupper(district))
   
   write.csv(rainfall, rainfile_name, row.names = FALSE)
 }

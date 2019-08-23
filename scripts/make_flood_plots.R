@@ -116,13 +116,6 @@ make_flood_overview_pdf <- function(districts, pdf_name, from_date="20070101", t
   dev.off()
 }
 
-CRA <- read_excel("raw_data/CRA Oeganda.xlsx")
-rainfall <- rainfall %>%
-  left_join(CRA %>% dplyr::select(name, pcode), by = "pcode") %>%
-  rename(district = name) %>%
-  mutate(district = toupper(district))
-
-
 districts <- sort(unique(impact_data$district))
 
 make_flood_overview_pdf(districts, "output/overview_per_district.pdf", verbose = FALSE)
