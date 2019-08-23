@@ -9,7 +9,8 @@ library(readxl)
 library(ggplot2)
 library(zoo)
 
-catchment = TRUE
+# -------------------------- Settings --------------------------------------------------
+rainfall_file_name <- file.path("raw_data", "rainfall_catchment.csv")
 
 #---------------------- Load in self gathered impact data -------------------------------
 impact_data <- read_csv("raw_data/own_impact_data.csv")
@@ -24,64 +25,8 @@ impact_data <- impact_data %>%
 crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
 
 # Load in rainfall dataset 
-if (catchment) {
-  rainfall <- read_csv("raw_data/rainfall_catchment.csv")
-  wshade <- readOGR(file.path("shapes", "uganda_catchment", "ug_cat.shp"),layer = "ug_cat")
-  wshade <- spTransform(wshade, crs1)
-  
-  # Put the names of the districts in rainfall dataset:
-  pcodes <- as.data.frame(wshade$N___N___PC)
-  rainfall <- cbind(rainfall, pcodes)
-  
-  # Remove ID from dataset (because now we have pcodes instead): 
-  rainfall$ID <- NULL
-  
-  # Move 'wshade$name' variable to front of dataset: 
-  rainfall <- dplyr::select(rainfall, "wshade$N___N___PC", everything())
-  
-} else {
-  rainfall <- read.delim("raw_data/rainfall.txt")
-  wshade <- readOGR("boundaries/districts.shp",layer = "districts")
-  wshade <- spTransform(wshade, crs1)
-  # Put the names of the districts in rainfall dataset:
-  districtname <- as.data.frame(wshade$name)
-  rainfall <- cbind(rainfall, districtname)
-  
-  # Remove ID from dataset (because now we have districtnames instead): 
-  rainfall$ID <- NULL
-  
-  # Move 'wshade$name' variable to front of dataset: 
-  rainfall <- dplyr::select(rainfall, "wshade$name", everything())
-  # Make the districtnames uppercase (needed to merge all datasets together):    
-  rainfall[,1] <- toupper(rainfall[,1]) 
-}
-
-
-# Name the column of the districtnames "ID": 
-colnames(rainfall)[1] <- "ID"
-
-# Remove "chirps.v2.0" from date: 
-colnames(rainfall) = gsub(pattern = "chirps.v2.0.", replacement = "", x = names(rainfall))
-
-# Transpose the data frame: 
-rainfall <- as.data.frame(t(rainfall))
-
-# Make the district names header: 
-colnames(rainfall) <- as.character(unlist(rainfall[1,]))
-rainfall <- rainfall[-1, ]
-
-# Make a column with the dates:  
-rainfall <- rainfall %>%
-  mutate(date = seq(as_date("19990101"), by = "day", length.out = nrow(rainfall)))
-
-# Make the date as.Date instead of a factor:
-rainfall$date <- as.Date(rainfall$date, format = "%Y.%m.%d")
-
-# Reshaping wide format to long format: 
-rainfall <- rainfall %>% gather(pcode, rainfall, contains('UGA'))
-
-# Make the numeric variables as.numeric: 
-# rainfall[3] <- data.frame(lapply(rainfall[3], function(x) as.numeric(as.character(x))))
+rainfall <- read.csv(rainfall_file_name) %>%
+  mutate(date = as_date(date))
 
 rainfall <- rainfall %>%
   dplyr::rename(zero_shifts = rainfall) %>%
@@ -190,13 +135,12 @@ make_flood_overview_pdf <- function(districts, pdf_name, from_date="20070101", t
   dev.off()
 }
 
-if (catchment) {
-  CRA <- read_excel("raw_data/CRA Oeganda.xlsx")
-  rainfall <- rainfall %>%
-    left_join(CRA %>% dplyr::select(name, pcode), by = "pcode") %>%
-    rename(district = name) %>%
-    mutate(district = toupper(district))
-}
+CRA <- read_excel("raw_data/CRA Oeganda.xlsx")
+rainfall <- rainfall %>%
+  left_join(CRA %>% dplyr::select(name, pcode), by = "pcode") %>%
+  rename(district = name) %>%
+  mutate(district = toupper(district))
+
 
 districts <- sort(unique(impact_data$district))
 

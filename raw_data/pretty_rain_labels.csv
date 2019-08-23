@@ -8,7 +8,3 @@ rainfall_3days,cum. 3 days
 rainfall_4days,cum. 4 days
 rainfall_6days,cum. 6 days
 rainfall_9days,cum. 9 days
-moving_avg_3,Mov. Avg. 3
-moving_avg_5,Mov. Avg. 5
-anomaly_avg3,Mov. Avg. 3 Anomaly
-anomaly_avg5,Mov. Avg. 5 Anomaly

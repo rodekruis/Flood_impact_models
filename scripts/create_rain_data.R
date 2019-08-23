@@ -4,65 +4,77 @@ library(raster)
 library(R.utils)
 
 
-## Extract rainfall per district of Uganda:
-catchment <- TRUE
-
-# Define projection
-crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
-
-# Define a clip
-clip <- function(raster,shape) {
+# Used in create_stacked_rain_raster to clip to the shape of Uganda
+clip <- function(raster, shape) {
   raster_crop <- crop(raster,shape)
-  raster_bsn <- mask(raster_crop,shape) 
+  raster_bsn <- mask(raster_crop,shape)
+  
   return(raster_bsn)
 }
 
-# Working directory for uganda boundary to read districts
-if (catchment) {
-  wshade <- readOGR(file.path("shapes", "uganda_catchment", "ug_cat.shp"),layer = "ug_cat")  
-} else {
-  wshade <- readOGR("boundaries/districts.shp",layer = "districts") 
+# Should really never be necessary to run again unless you e.g. want to load in new years of rain data
+# And be carefull this will run very very long, if you are new to this project better ask for the grid file from a team member
+create_stacked_rain_raster <- function(){
+  # Define projection
+  crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
+  
+  # Working directory for uganda boundary to read kenya boundary
+  cliper <- readOGR("boundaries/uga_admbnda_adm1_UBOS_v2.shp",layer = "uga_admbnda_adm1_UBOS_v2")
+  cliper <- spTransform(cliper, crs1)
+  
+  # Load list of files 
+  ascii_data <- list.files("raw_data/chirps", pattern = ".tif.gz") #List tif files downloaded by the python code
+  
+  # Clipe files to kenya boundary
+  xx <- raster::stack()
+  
+  # Read each ascii file to a raster and stack it to xx
+  for (files in ascii_data)  {
+    fn <- gunzip(file.path("raw_data", "chirps", files), skip = TRUE, overwrite = TRUE, remove = FALSE)
+    print(fn)
+    r2 <- raster(fn)
+    x1 <- clip(r2,cliper)
+    xx <- raster::stack(xx, x1)
+    file.remove(fn)
+  }
+  
+  # Remove noise from the data
+  xx[xx < 0] <- NA
+  
+  total_raster[total_raster < 0] <- NA
+  
+  writeRaster(total_raster, "processed_data/total_raster.grd", format="raster", overwrite = TRUE)
 }
 
-# Working directory for uganda boundary to read kenya boundary
-cliper <- readOGR("boundaries/uga_admbnda_adm1_UBOS_v2.shp",layer = "uga_admbnda_adm1_UBOS_v2")
-
-# Define similar projection
-cliper <- spTransform(cliper, crs1)
-wshade <- spTransform(wshade, crs1) 
-
-# Load list of files 
-ascii_data <- list.files("raw_data/chirps", pattern = ".tif.gz") #List tif files downloaded by the python code
-
-# Clipe files to kenya boundary
-xx <- raster::stack()
-
-# Read each ascii file to a raster and stack it to xx
-for (files in ascii_data)  {
-  fn <- gunzip(file.path("raw_data", "chirps", files),skip = TRUE, overwrite = TRUE, remove = FALSE)
-  print(fn)
-  r2 <- raster(fn)
-  x1 <- clip(r2,cliper)
-  xx <- raster::stack(xx, x1)
-  file.remove(fn)
-}
-
-# Remove noise from the data
-xx[xx < 0] <- NA
-
-total_raster[total_raster < 0] <- NA
-
-# Can be used to write the raster to a file for future use since it takes very long to build
-# writeRaster(total_raster, "processed_data/total_raster.grd", format="raster", overwrite = TRUE)
-# total_raster <- stack("processed_data/total_raster.grd")
-
-# Extract data for each district / you can use different functions here 
-arain <- raster::extract(x = total_raster,  y = wshade, fun = mean, df = TRUE, na.rm = TRUE)
-
-if (catchment) {
-  write.csv(arain, "raw_data/rainfall_catchment.csv", row.names = FALSE)
-  write.table(arain, "raw_data/rainfall_catchment.txt")
-} else {
-  write.csv(arain, "raw_data/rainfall.csv", row.names = FALSE)
-  write.table(arain, "raw_data/rainfall.txt")
+# Reads in the earlier produced raster and extracts rain data for specific shapes
+# Writes the rainfall file to a csv file
+extract_rain_data_for_shapes <- function(shapefile_path, layer, rainfile_name, use_large_split_files = TRUE){
+  crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
+  
+  # Usually the else method should work, but the raster is currently to big for the .grd structure 
+  if (use_large_split_files) {
+    load("processed_data/spat_data_20100215.Rdata")
+    raster1 <- xx
+    load("processed_data/spat_data_20100215_20190630.Rdata")
+    raster2 <- xx
+    total_raster <- stack(raster1, raster2)
+  } else {
+    total_raster <- stack("processed_data/total_raster.grd")    
+  }
+  
+  wshade <- readOGR(shapefile_path, layer = layer)
+  wshade <- spTransform(wshade, crs1)
+  
+  rainfall <- raster::extract(x = total_raster,  y = wshade, fun = mean, df = TRUE, na.rm = TRUE)
+  
+  rainfall['pcode'] <- wshade[[p_code_column]]
+  
+  colnames(rainfall) = gsub(pattern = "chirps.v2.0.", replacement = "", x = names(rainfall))
+  rainfall <- rainfall %>%
+    dplyr::select(-ID) %>% 
+    gather("date", "rainfall", -pcode) %>%
+    mutate(date = as_date(date))
+  
+  
+  write.csv(rainfall, rainfile_name, row.names = FALSE)
 }
