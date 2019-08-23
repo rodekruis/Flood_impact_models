@@ -78,3 +78,49 @@ extract_rain_data_for_shapes <- function(shapefile_path, layer, rainfile_name, u
   
   write.csv(rainfall, rainfile_name, row.names = FALSE)
 }
+
+# Central location to create extra rainfall vars
+# TODO make lag and moving avg options variable (but then also change in plot scripts)
+create_extra_rainfall_vars <- function(rainfall, many_vars=FALSE, moving_avg=TRUE, anomaly=TRUE) {
+      
+  rainfall <- rainfall %>%
+    dplyr::rename(zero_shifts = rainfall) %>%
+    mutate(
+      zero_shifts = as.numeric(zero_shifts),
+      one_shift = lag(zero_shifts, 1),
+      two_shifts = lag(zero_shifts, 2),
+      three_shifts = lag(zero_shifts, 3),
+      rainfall_2days = zero_shifts + one_shift,
+      rainfall_3days = rainfall_2days + two_shifts,
+      rainfall_4days = rainfall_3days + three_shifts,
+      rainfall_6days = rainfall_4days + lag(zero_shifts, 5),
+      rainfall_9days = rainfall_6days + lag(zero_shifts, 7) + lag(zero_shifts, 8))
+  
+  if (many_vars) {
+    rainfall <- rainfall %>%
+      mutate(
+        four_shifts = lag(zero_shifts, 4),
+        five_shifts = lag(zero_shifts, 5),
+        rainfall_5days = rainfall_4days + four_shifts)
+  }
+
+  if (moving_avg) {
+    rainfall <- rainfall %>%
+      mutate(
+        moving_avg_3 = rollmean(one_shift, 3, fill = NA, align = "right"),
+        moving_avg_5 = rollmean(one_shift, 5, fill = NA, align = "right")
+      )
+  }
+  
+  if (anomaly) {
+    rainfall <- rainfall %>%
+      mutate(
+        anomaly_avg3 = zero_shifts - moving_avg_3,
+        anomaly_avg5 = zero_shifts - moving_avg_5
+      )
+  }
+  
+  return(rainfall)
+}
+
+

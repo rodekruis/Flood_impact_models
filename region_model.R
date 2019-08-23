@@ -12,7 +12,7 @@ layer <- "ug_cat"
 p_code_column <- "N___N___PC"  # The column in the shapefile containing the pcode
 
 rainfile_path <- file.path("raw_data", "rainfall_catchment.csv")
-produce_new_rainfall_csv <- TRUE
+produce_new_rainfall_csv <- FALSE
 regions <- c()
 
 
@@ -26,10 +26,10 @@ if (produce_new_rainfall_csv) {
 rainfall <- read.csv(rainfile_path) %>%
   mutate(date = as_date(date))
 
-
 # -------------------- Mutating, merging and aggregating -------
+rainfall <- create_extra_rainfall_vars(rainfall)
 
-# Here we define lags, moving averages, etc.
+
 
 # Link flood events
 

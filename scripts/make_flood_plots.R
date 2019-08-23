@@ -28,26 +28,7 @@ crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 rainfall <- read.csv(rainfall_file_name) %>%
   mutate(date = as_date(date))
 
-rainfall <- rainfall %>%
-  dplyr::rename(zero_shifts = rainfall) %>%
-  mutate(
-    zero_shifts = as.numeric(zero_shifts),
-    one_shift = lag(zero_shifts, 1),
-    two_shifts = lag(zero_shifts, 2),
-    three_shifts = lag(zero_shifts, 3),
-    # four_shifts = lag(zero_shifts, 4),
-    # five_shifts = lag(zero_shifts, 5),
-    rainfall_2days = zero_shifts + one_shift,
-    rainfall_3days = rainfall_2days + two_shifts,
-    rainfall_4days = rainfall_3days + three_shifts,
-    rainfall_6days = rainfall_4days + lag(zero_shifts, 5),
-    rainfall_9days = rainfall_6days + lag(zero_shifts, 7) + lag(zero_shifts, 8),
-    # rainfall_5days = rainfall_4days + four_shifts
-    moving_avg_3 = rollmean(one_shift, 3, fill = NA, align = "right"),
-    moving_avg_5 = rollmean(one_shift, 5, fill = NA, align = "right"),
-    anomaly_avg3 = zero_shifts - moving_avg_3,
-    anomaly_avg5 = zero_shifts - moving_avg_5
-  )
+rainfall <- create_extra_rainfall_vars(rainfall)
 
 make_plots <- function(gg_data, district, verbose=FALSE){
   plot_theme <- theme(axis.title.y = element_blank(),
