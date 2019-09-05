@@ -1,6 +1,8 @@
 # -------------------- Libs & Sources ------------------------
 library(dplyr)
-
+library(readr)
+library(lubridate)
+library(stringr)
 
 source('scripts/create_rain_data.R')
 source('scripts/prepare_glofas_data.R')
@@ -52,5 +54,3 @@ glofas_data <- make_glofas_district_matrix(glofas_data)
 df <- rainfall %>%
   left_join(impact_data %>% dplyr::select(district, date, flood), by = c('district', 'date')) %>%
   left_join(glofas_data, by = c("district", "date"))
-
-  

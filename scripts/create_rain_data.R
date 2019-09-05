@@ -2,7 +2,7 @@
 library(rgdal)
 library(raster)
 library(R.utils)
-
+library(zoo)
 
 # Used in create_stacked_rain_raster to clip to the shape of Uganda
 clip <- function(raster, shape) {
