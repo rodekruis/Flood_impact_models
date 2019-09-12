@@ -9,6 +9,8 @@ library(readxl)
 library(ggplot2)
 library(zoo)
 
+source("scripts/create_rain_data.R")
+
 # -------------------------- Settings --------------------------------------------------
 rainfall_file_name <- file.path("raw_data", "rainfall_catchment.csv")
 
@@ -29,6 +31,8 @@ rainfall <- read.csv(rainfall_file_name) %>%
   mutate(date = as_date(date))
 
 rainfall <- create_extra_rainfall_vars(rainfall)
+
+rainfall_katakwi <- rainfall %>% filter(district == "KATAKWI")
 
 make_plots <- function(gg_data, district, verbose=FALSE){
   plot_theme <- theme(axis.title.y = element_blank(),

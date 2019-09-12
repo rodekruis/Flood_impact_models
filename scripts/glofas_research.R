@@ -1,6 +1,8 @@
 library(purrr)
 library(zoo)
 
+source('scripts/prepare_glofas_data.R')
+
 # Read and prep glofas files
 glofas_data <- prep_glofas_data()
 
@@ -62,7 +64,8 @@ dev.off()
 
 # ------------------- Plots per flood ----------------
 impact_sub <- impact_data %>%
-  filter(district %in% glofas_with_regions$district)
+  filter(district %in% glofas_with_regions$district) %>%
+  arrange(district, date)
 
 pdf("output/stations_per_flood.pdf", width=11, height=8.5)
 

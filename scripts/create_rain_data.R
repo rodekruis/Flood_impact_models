@@ -90,6 +90,7 @@ create_extra_rainfall_vars <- function(rainfall, many_vars=FALSE, moving_avg=TRU
       
   rainfall <- rainfall %>%
     dplyr::rename(zero_shifts = rainfall) %>%
+    arrange(district, date) %>%
     mutate(
       zero_shifts = as.numeric(zero_shifts),
       one_shift = lag(zero_shifts, 1),

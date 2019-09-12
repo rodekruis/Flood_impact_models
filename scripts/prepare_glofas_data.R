@@ -17,6 +17,19 @@ prep_glofas_data <- function(){
   return(glofas_data)
 }
 
+
+fill_glofas_data <- function(glofas_data){
+  glofas_filled <- tibble(date = seq(min(glofas_data$date), max(glofas_data$date), by = "1 day"))
+  glofas_filled <- merge(glofas_filled, tibble(station = unique(glofas_data$station)))
+  
+  glofas_filled <- glofas_filled %>%
+    left_join(glofas_data, by = c("station", "date")) %>%
+    arrange(station, date) %>%
+    mutate(dis = na.locf(dis))
+  
+  return(glofas_filled)
+}
+
 make_glofas_district_matrix <- function(glofas_data) {
   
   glofas_with_regions <- read_csv('raw_data/glofas_with_regions.csv')
