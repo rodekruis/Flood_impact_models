@@ -76,6 +76,7 @@ df <- rainfall %>%
 library(rpart)
 library(rpart.plot)
 library(caret)
+library(rattle)
 
 first_flood_date <- min(df %>% filter(flood == 1) %>% pull(date)) # Throw away data more than 1 year before first flood
 
@@ -106,5 +107,4 @@ confusionMatrix(predict(model2, type = "class"), reference=as.factor(df_model$fl
 # summary(model2)
 rpart.plot(model2, type = 2, extra=1)
 
-
-
+fancyRpartPlot(model2, cex=0.7)
