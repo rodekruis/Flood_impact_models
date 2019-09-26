@@ -48,7 +48,7 @@ if (length(regions) != 0) {
     filter(district %in% regions)
 }
 
-# Temporary, only working for Katakwi
+# Temporary, only available for Katakwi
 anomalies <- read.csv('raw_data/rainfall_anomaly_katakwi.csv', stringsAsFactors = FALSE)
 anomalies$date <- as.Date(anomalies$date)
 anomalies <- anomalies %>% rename(anomaly = rainfall)
@@ -87,11 +87,11 @@ df_model <- df %>%
 
 model1 <- rpart(formula = flood ~ . , data = df_model,
                 method = "class",
-                minsplit = 10, minbucket = 5)
+                minsplit = 9, minbucket = 3)
 
-summary(model1)
+# summary(model1)
 
-rpart.plot(model1, type = 2, extra = 104)
+rpart.plot(model1, type = 2, extra = 1)
 confusionMatrix(predict(model1, type = "class"), reference=as.factor(df_model$flood))
 
 penal <- matrix(c(0, 1, 10, 0), nrow = 2, byrow = TRUE)
@@ -99,12 +99,12 @@ penal <- matrix(c(0, 1, 10, 0), nrow = 2, byrow = TRUE)
 model2 <- rpart(formula = flood ~ . , data = df_model,
                 method = "class",
                 parms = (list(loss=penal)),
-                minsplit = 10, minbucket = 1)
+                minsplit = 9, minbucket = 3)
 
 confusionMatrix(predict(model2, type = "class"), reference=as.factor(df_model$flood))$table
 
-summary(model2)
-rpart.plot(model2, type = 2, extra = 104)
+# summary(model2)
+rpart.plot(model2, type = 2, extra=1)
 
 
 
