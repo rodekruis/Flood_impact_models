@@ -40,14 +40,22 @@ impact_data <- impact_data %>%
 
 
 # -------------------- Mutating, merging and aggregating -------
-rainfall <- create_extra_rainfall_vars(rainfall)
-
+rainfall <- create_extra_rainfall_vars(rainfall, moving_avg = FALSE, anomaly = FALSE)
 
 # See documentation for regions in settings above
 if (length(regions) != 0) {
   rainfall <- rainfall %>%
     filter(district %in% regions)
 }
+
+# Temporary, only working for Katakwi
+anomalies <- read.csv('raw_data/rainfall_anomaly_katakwi.csv', stringsAsFactors = FALSE)
+anomalies$date <- as.Date(anomalies$date)
+anomalies <- anomalies %>% rename(anomaly = rainfall)
+
+rainfall <- rainfall %>%
+  left_join(anomalies %>% dplyr::select(date, anomaly), by="date")
+
 
 glofas_data <- prep_glofas_data()
 glofas_data <- fill_glofas_data(glofas_data)  # Glofas data is only available each three days, this will fill it
@@ -65,36 +73,35 @@ df <- rainfall %>%
 
 # ------------------- Simple decision tree model -----------------
 
+library(rpart)
+library(rpart.plot)
+library(caret)
+
 first_flood_date <- min(df %>% filter(flood == 1) %>% pull(date)) # Throw away data more than 1 year before first flood
 
 # Remove empty columns (unrelated glofas points)
 df_model <- df %>%
   select_if(~sum(!is.na(.)) > 0) %>%
-  mutate(flood = replace_na(flood, 0)) %>%
+  mutate(flood = as.factor(replace_na(flood, 0))) %>%
   filter(date > first_flood_date - 365)
 
-
-library(rpart)
-library(rpart.plot)
-library(caret)
-
-model1 <- rpart(formula = flood ~ . , data = df,
+model1 <- rpart(formula = flood ~ . , data = df_model,
                 method = "class",
                 minsplit = 10, minbucket = 5)
 
 summary(model1)
 
 rpart.plot(model1, type = 2, extra = 104)
-confusionMatrix(predict(model1, type = "class"), reference=as.factor(df$flood))
+confusionMatrix(predict(model1, type = "class"), reference=as.factor(df_model$flood))
 
 penal <- matrix(c(0, 1, 10, 0), nrow = 2, byrow = TRUE)
 
-model2 <- rpart(formula = flood ~ . , data = df,
+model2 <- rpart(formula = flood ~ . , data = df_model,
                 method = "class",
                 parms = (list(loss=penal)),
-                minsplit = 10, minbucket = 5)
+                minsplit = 10, minbucket = 1)
 
-confusionMatrix(predict(model2, type = "class"), reference=as.factor(df$flood))$table
+confusionMatrix(predict(model2, type = "class"), reference=as.factor(df_model$flood))$table
 
 summary(model2)
 rpart.plot(model2, type = 2, extra = 104)

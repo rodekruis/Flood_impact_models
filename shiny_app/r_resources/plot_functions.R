@@ -10,7 +10,7 @@ plot_rainfall_shifts <- function(df){
 
 plot_rainfall_cums <- function(df){
   p <- df %>%
-    dplyr::select(date, contains('days')) %>%
+    dplyr::select(date, contains('days'), contains('anomaly')) %>%
     gather("var", "val", -date) %>%
     ggplot(aes(x=date, y=val)) + geom_line() + facet_wrap(~var)
 
@@ -29,3 +29,5 @@ plot_glofas <- function(df){
   p <- ggplotly(p)
   return(p)
 }
+
+plot(rainfall$anomaly)

@@ -34,19 +34,3 @@ server <- function(input, output) {
     p
   })
 }
-
-# all_data <- read.csv('shiny_app/data/prepped_data.csv') %>%
-#   mutate(date = as_date(date))
-# 
-# df <- all_data %>%
-#   filter(district == "KATAKWI")
-# 
-# df %>%
-#   summary()
-#   select_if(~sum(!is.na(.)) > 0) %>%
-#   str()
-#   select(date, contains('F0'))
-# #%>%
-#   drop_na() %>%
-#   gather("var", "val", -date) %>%
-#   ggplot(aes(x=date, y=val)) + geom_line() + facet_wrap(~var)
