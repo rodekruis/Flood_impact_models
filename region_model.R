@@ -16,7 +16,7 @@ shapefile_path <- file.path("shapes", "uganda_catchment", "ug_cat.shp")
 layer <- "ug_cat"
 p_code_column <- "N___N___PC"  # The column in the shapefile containing the pcode
 
-rainfile_path <- file.path("raw_data", "rainfall_catchment.csv")
+rainfile_path <- file.path("raw_data", "uganda", "rainfall_catchment.csv")
 produce_new_rainfall_csv <- FALSE
 regions <- c("KATAKWI")  # A vector of districts, e.g. c("KAMPALA", "KASESE"). If the vector is empty, i.e. c(), it takes all regions 
 # regions = c()
@@ -31,7 +31,7 @@ if (produce_new_rainfall_csv) {
 rainfall <- read.csv(rainfile_path) %>%
   mutate(date = as_date(date))
 
-impact_data <- read_csv("raw_data/own_impact_data.csv")
+impact_data <- read_csv("raw_data/uganda/own_impact_data.csv")
 impact_data <- impact_data %>%
   mutate(date = as_date(Date),
          district = str_to_upper(Area),
@@ -49,7 +49,7 @@ if (length(regions) != 0) {
 }
 
 # Temporary, only available for Katakwi
-anomalies <- read.csv('raw_data/rainfall_anomaly_katakwi.csv', stringsAsFactors = FALSE)
+anomalies <- read.csv('raw_data/uganda/rainfall_anomaly_katakwi.csv', stringsAsFactors = FALSE)
 anomalies$date <- as.Date(anomalies$date)
 anomalies <- anomalies %>% rename(anomaly = rainfall)
 
@@ -67,8 +67,8 @@ df <- rainfall %>%
   left_join(impact_data %>% dplyr::select(district, date, flood), by = c('district', 'date')) %>%
   left_join(glofas_data, by = c("district", "date"))
 
-# write.csv(df, 'output/prepped_data.csv', row.names=FALSE)
-# write.csv(df, 'shiny_app/data/prepped_data.csv', row.names=FALSE)
+# write.csv(df, 'output/uganda/shiny_explorer_input.csv', row.names=FALSE)
+# write.csv(df, 'scripts/shiny_uganda_data_explorer/data/shiny_explorer_input.csv', row.names=FALSE)
 
 
 # ------------------- Simple decision tree model -----------------

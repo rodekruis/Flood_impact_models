@@ -19,18 +19,18 @@ create_stacked_rain_raster <- function(){
   crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
   
   # Working directory for uganda boundary to read kenya boundary
-  cliper <- readOGR("boundaries/uga_admbnda_adm1_UBOS_v2.shp",layer = "uga_admbnda_adm1_UBOS_v2")
+  cliper <- readOGR("shapes/uga_admbnda_adm1/uga_admbnda_adm1_UBOS_v2.shp",layer = "uga_admbnda_adm1_UBOS_v2")
   cliper <- spTransform(cliper, crs1)
   
   # Load list of files 
-  ascii_data <- list.files("raw_data/chirps", pattern = ".tif.gz") #List tif files downloaded by the python code
+  ascii_data <- list.files("raw_data/chirps_full", pattern = ".tif.gz") #List tif files downloaded by the python code
   
   # Clipe files to kenya boundary
   xx <- raster::stack()
   
   # Read each ascii file to a raster and stack it to xx
   for (files in ascii_data)  {
-    fn <- gunzip(file.path("raw_data", "chirps", files), skip = TRUE, overwrite = TRUE, remove = FALSE)
+    fn <- gunzip(file.path("raw_data", "chirps_full", files), skip = TRUE, overwrite = TRUE, remove = FALSE)
     print(fn)
     r2 <- raster(fn)
     x1 <- clip(r2,cliper)
@@ -43,7 +43,7 @@ create_stacked_rain_raster <- function(){
   
   total_raster[total_raster < 0] <- NA
   
-  writeRaster(total_raster, "processed_data/total_raster.grd", format="raster", overwrite = TRUE)
+  writeRaster(total_raster, "processed_data/uganda/total_raster.grd", format="raster", overwrite = TRUE)
 }
 
 # Reads in the earlier produced raster and extracts rain data for specific shapes
@@ -53,13 +53,13 @@ extract_rain_data_for_shapes <- function(shapefile_path, layer, rainfile_name, u
   
   # Usually the else method should work, but the raster is currently to big for the .grd structure 
   if (use_large_split_files) {
-    load("processed_data/spat_data_20100215.Rdata")
+    load("processed_data/uganda/spat_data_20100215.Rdata")
     raster1 <- xx
-    load("processed_data/spat_data_20100215_20190630.Rdata")
+    load("processed_data/uganda/spat_data_20100215_20190630.Rdata")
     raster2 <- xx
     total_raster <- stack(raster1, raster2)
   } else {
-    total_raster <- stack("processed_data/total_raster.grd")    
+    total_raster <- stack("processed_data/uganda/total_raster.grd")    
   }
   
   wshade <- readOGR(shapefile_path, layer = layer)
@@ -75,7 +75,7 @@ extract_rain_data_for_shapes <- function(shapefile_path, layer, rainfile_name, u
     gather("date", "rainfall", -pcode) %>%
     mutate(date = as_date(date))
   
-  CRA <- read_excel("raw_data/CRA Oeganda.xlsx")
+  CRA <- read_excel("raw_data/uganda/CRA Oeganda.xlsx")
   rainfall <- rainfall %>%
     left_join(CRA %>% dplyr::select(name, pcode), by = "pcode") %>%
     rename(district = name) %>%

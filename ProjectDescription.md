@@ -1,5 +1,7 @@
 # Impact data analysis Uganda:  
 
+(This readme should be updated. This is the model as created by Veronique when writing her thesis. The model now is more region specific and using a simple decision tree.)
+
 This project is based on creating statistical models that are able to predict the impact of future floods in Uganda (part of the Impact Based Forecasting process). 
 
 In this readme file, I will discuss the following: 

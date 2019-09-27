@@ -12,10 +12,10 @@ library(zoo)
 source("scripts/create_rain_data.R")
 
 # -------------------------- Settings --------------------------------------------------
-rainfall_file_name <- file.path("raw_data", "rainfall_catchment.csv")
+rainfall_file_name <- file.path("raw_data", "uganda", "rainfall_catchment.csv")
 
 #---------------------- Load in self gathered impact data -------------------------------
-impact_data <- read_csv("raw_data/own_impact_data.csv")
+impact_data <- read_csv("raw_data/uganda/own_impact_data.csv")
 impact_data <- impact_data %>%
   mutate(date = as_date(Date),
          district = str_to_upper(Area),
@@ -31,8 +31,6 @@ rainfall <- read.csv(rainfall_file_name) %>%
   mutate(date = as_date(date))
 
 rainfall <- create_extra_rainfall_vars(rainfall)
-
-rainfall_katakwi <- rainfall %>% filter(district == "KATAKWI")
 
 make_plots <- function(gg_data, district, verbose=FALSE){
   plot_theme <- theme(axis.title.y = element_blank(),
@@ -122,11 +120,11 @@ make_flood_overview_pdf <- function(districts, pdf_name, from_date="20070101", t
 
 districts <- sort(unique(impact_data$district))
 
-make_flood_overview_pdf(districts, "output/overview_per_district.pdf", verbose = FALSE)
-make_flood_overview_pdf(districts, "output/overview_per_district_detailed.pdf", verbose = TRUE)
+make_flood_overview_pdf(districts, "output/uganda/overview_per_district.pdf", verbose = FALSE)
+make_flood_overview_pdf(districts, "output/uganda/overview_per_district_detailed.pdf", verbose = TRUE)
 
 # Temporary solution, in the future we should just rename the lag columns to something sensible
-rain_labels <- read_csv('raw_data/pretty_rain_labels.csv')
+rain_labels <- read_csv('raw_data/uganda/pretty_rain_labels.csv')
 
 impact_data <- impact_data %>%
   arrange(district, date)
@@ -196,4 +194,4 @@ make_zoomed_in_plots <- function(pdf_name){
   dev.off() 
 }
 
-make_zoomed_in_plots("output/zoomed_in_per_flood.pdf")
+make_zoomed_in_plots("output/uganda/zoomed_in_per_flood.pdf")

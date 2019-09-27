@@ -25,9 +25,9 @@ glofas_filled <- glofas_filled %>%
   mutate(dis_filled = na.locf(dis))
 
 # read the stations per region and gathered impact data
-glofas_with_regions <- read_csv('raw_data/glofas_with_regions.csv')
+glofas_with_regions <- read_csv('raw_data/uganda/glofas_with_regions.csv')
 
-impact_data <- read_csv("raw_data/own_impact_data.csv")
+impact_data <- read_csv("raw_data/uganda/own_impact_data.csv")
 
 impact_data <- impact_data %>%
   mutate(date = as_date(Date),
@@ -36,7 +36,7 @@ impact_data <- impact_data %>%
   dplyr::select(-Date, -Area)
 
 # ------------------- Plots per station -----------------------------
-pdf("output/flood_per_station.pdf", width=11, height=8.5)
+pdf("output/uganda/flood_per_station.pdf", width=11, height=8.5)
 
 for (station in unique(glofas_with_regions$station)) {
   districts <- glofas_with_regions %>% 
@@ -67,7 +67,7 @@ impact_sub <- impact_data %>%
   filter(district %in% glofas_with_regions$district) %>%
   arrange(district, date)
 
-pdf("output/stations_per_flood.pdf", width=11, height=8.5)
+pdf("output/uganda/stations_per_flood.pdf", width=11, height=8.5)
 
 for (i in 1:nrow(impact_sub)) {
   flood_date <- impact_sub[i, ]$date

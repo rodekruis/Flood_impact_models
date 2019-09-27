@@ -15,7 +15,7 @@ right = function(text, num_char) {
 
 # Prepare the cliper
 crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
-cliper <- readOGR("boundaries/uga_admbnda_adm1_UBOS_v2.shp",layer = "uga_admbnda_adm1_UBOS_v2")
+cliper <- readOGR("shapes/uga_admbnda_adm1/uga_admbnda_adm1_UBOS_v2.shp",layer = "uga_admbnda_adm1_UBOS_v2")
 cliper <- spTransform(cliper, crs1)
 
 # Make a grid of dates
@@ -26,8 +26,8 @@ dates <- dates %>%
          day = str_pad(day(date), 2, side="left", "0"),
          filepart_avg = paste(month, day, 'tif', sep = "."))
 
-filenames = list.files('raw_data/chirps_uganda_tifs')
-filenames = sapply(filenames, function(x) paste0('raw_data/chirps_uganda_tifs/', x), USE.NAMES=FALSE)
+filenames = list.files('raw_data/uganda/chirps_tifs')
+filenames = sapply(filenames, function(x) paste0('raw_data/uganda/chirps_tifs/', x), USE.NAMES=FALSE)
 
 # Loop over all days
 for (date_substr in dates$filepart[305:366]){
@@ -44,7 +44,7 @@ for (date_substr in dates$filepart[305:366]){
     day_stack <- raster::stack(day_stack, clipped_raster)
     
     new_filename <- str_sub(gsub('.tif.gz', '', filename), -10, -1)
-    writeRaster(clipped_raster, paste0("raw_data/chirps_uganda_tifs/", new_filename, '_rainfallraw.tif'), overwrite=TRUE)    
+    writeRaster(clipped_raster, paste0("raw_data/uganda/chirps_tifs/", new_filename, '_rainfallraw.tif'), overwrite=TRUE)    
     
     file.remove(rain_file)
   }  
@@ -53,7 +53,7 @@ for (date_substr in dates$filepart[305:366]){
   avg_day_stack <- mean(day_stack, na.rm=T)
 
   
-  writeRaster(day_stack, paste0("raw_data/chirps_dayaverages/", date_substr), overwrite = TRUE)
+  writeRaster(day_stack, paste0("raw_data/uganda/chirps_dayaverages/", date_substr), overwrite = TRUE)
 }
 
 
@@ -63,7 +63,7 @@ for (filepart_avg in dates$filepart_avg){
   filepart_raw <- gsub('.tif', '_rainfallraw.tif', filepart_avg)
   filenames_sub <- filenames[grep(filepart_raw, filenames)]
 
-  day_avg_raster <- raster(paste0("raw_data/chirps_dayaverages/", filepart_avg))  
+  day_avg_raster <- raster(paste0("raw_data/uganda/chirps_dayaverages/", filepart_avg))  
   
   
   # Loop over all files related to this date, clip the raster and stack them up
@@ -75,7 +75,7 @@ for (filepart_avg in dates$filepart_avg){
     anomaly_raster <- clipped_raster - day_avg_raster
     
     new_filename <- str_sub(gsub('_rainfallraw.tif', '', filename), -10, -1)
-    writeRaster(anomaly_raster, paste0("raw_data/chirps_anomalies/", new_filename, '_anomaly.tif'), overwrite = TRUE)
+    writeRaster(anomaly_raster, paste0("raw_data/uganda/chirps_anomalies/", new_filename, '_anomaly.tif'), overwrite = TRUE)
   }
 }
 
@@ -92,7 +92,7 @@ wshade <- readOGR(shapefile_path, layer = layer)
 wshade <- spTransform(wshade, crs1)
 wshade2 <- wshade[wshade@data$N___N___PC == "21UGA013005",]
 
-raster_stack <- sapply(paste0('raw_data/chirps_anomalies/', list.files('raw_data/chirps_anomalies')), raster)
+raster_stack <- sapply(paste0('raw_data/uganda/chirps_anomalies/', list.files('raw_data/uganda/chirps_anomalies')), raster)
 raster_stack <- raster::stack(raster_stack)
 
 rainfall <- raster::extract(x = raster_stack,  y = wshade2, fun = quantile95, df = TRUE, na.rm = TRUE)
@@ -110,5 +110,5 @@ rainfall2 <- rainfall %>%
 
 rainfall2$district = "Katakwi"
 
-write.csv(rainfall2, 'raw_data/rainfall_anomaly_katakwi.csv', row.names = FALSE)
+write.csv(rainfall2, 'raw_data/uganda/rainfall_anomaly_katakwi.csv', row.names = FALSE)
 

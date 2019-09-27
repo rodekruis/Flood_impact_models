@@ -4,8 +4,8 @@
 *.Ruserdata
 *.Rproj
 *.tif.gz
+*.tif
 .Rproj.user
 *.grd
 *.gri
 *.pdf
-raw_data/chirps*
