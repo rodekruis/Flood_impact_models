@@ -1,0 +1,330 @@
+﻿Region;Zone;Woreda;Pcode;Belg_2010;Kiremt_2010;Kiremt_2011;Kiremt_2012;Belg_2013;Kiremt_2013;Belg_2014;Kiremt_2014;Kiremt_2015;Belg_2016;Kiremt_2016;Kiremt_2017;Belg_2018;Frequency;Affected_pop
+Somali;Fafan;Gursum;ET050202;;;;;;;;;;;;; 715 ;1; 715 
+SNNPR;Gamo Gofa;Denibu Gofa;ET071002;;1;;;;;;;;;;; 17 ;2; 9 
+Oromia;East Shewa;Bora;ET040710;;2,400;;;;;;;1; 1 ;1; 1 ; 245 ;6; 442 
+SNNPR;Selti;Alicho weriro;ET072001;;;;;;;;;;;;;1268;; 1,268 
+SNNPR;Selti;Selti;ET072002;;;;;;;;;1; 4,000 ; 8,497 ;;1630;4; 3,532 
+SNNPR;Gurage;Meskan;ET070106;;;;;;;;;1;; 4,140 ;;2998;3; 2,380 
+Oromia;Borena;Arero;ET041208;;;;;;;;;;; 835 ;; 583 ;2; 709 
+Oromia;Arsi;Sude;ET040808;;;;;;;;;;;;; 633 ;1; 633 
+Somali;Nogob;Gerbo;ET050403;;;;;;;;;;;;; 638 ;1; 638 
+Somali;Afder;Dolobay;ET050808;;; 1 ; 1 ;;; 8,250 ;1;1;;1;; 776 ;7; 1,290 
+Oromia;West Harerge;Doba;ET040902;;;;;;;;;;;;; 77 ;1; 77 
+Somali;Afder;Hargele;ET0508061;;;; 1 ;; 1 ; 8,965 ;1;1;;1;; 8,899 ;7; 2,553 
+Oromia;West Harerge;Mesela;ET040904; 35,317 ;;;;;;;;;;;;88;2; 17,703 
+Oromia;East Harareg;Girawa;ET041016;;;;;;;;;;; 18,085 ;;1023;2; 9,554 
+Tigray;Eastern;Atsbi Wenberta;ET010307;;;;;;;;;;;; 1 ; 1,320 ;2; 661 
+Somali;Afder;Chereti/Weyib;ET050802;;; 667 ; 1 ;;;;;1;;1;; 1,529 ;5; 440 
+Somali;Afder;Raso;ET050884;;;;;;;;;;;;; 1,617 ;1; 1,617 
+Amahra;North Shewa(R3);Eferatana Gidem;ET030508;;;;;;;;;1;;1;;159.5;3; 54 
+Amahra;West Gojam;Jabi Tehnan;ET030709;;;;;;;;;;;;; 11 ;; 11 
+Tigray;Eastern;Erob;ET010302;;;;;;;;;;;;;198;; 198 
+SNNPR;Gamo Gofa;Ubadebretsehay;ET071011; 550 ;;;;;;;;;;;; 17 ;2; 283 
+Amahra;North Wollo;kobo;ET030302;;37796; 1 ; 5,014 ;;;;;1;;1;; 220 ;6; 7,172 
+Somali;Afder;West Imi;ET050805;;; 1 ;;;; 11,616 ;1;1;;1;; 248 ;6; 1,978 
+Somali;Liben;Dolo Odo;ET050902;;;;;;; 24,563 ;1;1;;1;; 2,475 ;5; 5,408 
+Oromia;Arsi;Tena;ET040813;;;;;;;;;;;;; 248 ;1; 248 
+Oromia;Borena;Miyo;ET041216; 600 ;;;;;;;;; 900 ;;; 297 ;3; 599 
+Oromia;Arsi;Gololcha Arsi;ET040803;;;;;;;;;; 15,675 ; 24,255 ; 1 ; 28 ;4; 9,990 
+Oromia;Borena;Dire;ET041211;;;;;;;;;; 2,275 ; 750 ;; 39 ;3; 1,021 
+Somali;Nogob;Dihun;ET050406;;;;;;;;;;;;; 435 ;1; 435 
+Oromia;Arsi;Chole;ET040809;;;;;;;;;1; 2,228 ; 2,025 ;; 473 ;4; 1,182 
+Oromia;Arsi;Munessa;ET040817;;;;;;;;;;;;; 44 ;1; 44 
+Gambela;Agnuak;Gambela Zuria;ET120202;; 1,992 ; 3,683 ; 1,197 ;; -   ;; 3,400 ;1;; 1,033 ; 1 ;;8; 1,413 
+Gambela;Agnuak;Itang;ET120207;; 12,353 ; 5,845 ; 4,624 ;; -   ;; 6,214 ;1;; 4,030 ; 1 ;;8; 4,134 
+Gambela;Agnuak;Jore;ET120204;; 2,800 ; 4,760 ; 2,827 ;; -   ;; 6,232 ;1;; 4,860 ; 1 ;;8; 2,685 
+Gambela;Nuer;Jikawo;ET120103;; 978 ; -   ; -   ;; -   ;; 7,922 ;1;; 6,509 ; 1 ;;8; 1,926 
+Gambela;Nuer;Lare;ET120102;;9,456; 7,395 ; 2,620 ;; 4,725 ;; 2,850 ;1;; 5,100 ; 1 ;;8; 4,019 
+Somali;Afder;Afder;ET050806;;; 1 ;;;;;;1;;1;;;3; 1 
+Gambela;Agnuak;Gog;ET120203;; 6,900 ; 2,728 ; 2,000 ;; -   ;; 4,861 ;1;; 2,010 ;;;7; 2,643 
+Gambela;Gambella Administrative;Gambella Town;ET120106;;5760; 4,515 ; 1,909 ;; 1,860 ;; 4,627 ;;; -   ; 1 ;;7; 2,667 
+Somali;Afder;Serer/Elkere;ET050804;;;;;;;;;1;;1;;;2; 1 
+Gambela;Nuer;Akobo;ET120101;; 2,480 ; -   ; 1,440 ;; -   ;; 6,950 ;1;; 415 ;;;7; 1,612 
+Gambela;Nuer;Wantawo;ET120104;; 1,800 ; 468 ; 1,440 ;;;; 3,422 ;1359;; 3,849 ; 1 ;;7; 1,763 
+Somali;Afder;Bare;ET050807;;; 1 ;;;;;;;;;;;1; 1 
+Gambela;Agnuak;Abobo;ET120201;;1; -   ; -   ;; -   ;; -   ;;; -   ;;;6; 0 
+Gambela;Agnuak;Dima;ET120205;; 840 ; -   ; 500 ;; -   ;; - ;1;;20,136;;;6; 3,580 
+Afar;Gabi (Zone 3);Amibara;ET020301;; 2,950 ;;;;; 33,869 ;1;1;; 17,915 ; 1,250 ;;6; 9,331 
+Afar;Gabi (Zone 3);Awash fentale;ET020302;; 900 ;;;;; 1,650 ;1;1;; 1,825 ; 1,815 ;;6; 1,032 
+Afar;Gabi (Zone 3);Bure Mudaytu;ET020305;; 2,605 ;;;;; 14,487 ;1;1;; 9,470 ; 3,150 ;;6; 4,952 
+Amahra;East Gojam;Goncha Siso Enese;ET030603;;;; 2,636 ;;;;;;; 13 ;;;2; 1,325 
+Gambela;Nuer;Makuey;ET120105;; 902 ; - ; 8,164 ;; -   ;; 1,628 ;;; -   ; 1 ;;6; 1,783 
+SNNPR;Alaba;Alaba SP Woreda;ET072101;;;;;;;;;1; 1 ; 18,000 ;;;3; 6,001 
+Somali;Dawa;Hudet;ET050904;;;;;;;;;;;;; 1,271 ;1; 1,271 
+Somali;Dawa;Qadadumo;ET059998;;;;;;;;;;;;; 3,207 ;1; 3,207 
+Amahra;East Gojam;Aneded;ET030617;;;;;;;;;;;; 1 ;;1; 1 
+Amahra;East Gojam;Enarj Enawga;ET030605;;;; 1,410 ;;;;;;;;;;1; 1,410 
+Somali;Fafan;Jijiga;ET050204; 1,450 ;;;;;;;;; 1 ;;; 8,333 ;3; 3,261 
+Somali;Fafan;Babile;ET050201;;;;;;;;;1;;1;;;2; 1 
+Amahra;East Gojam;Enbise Sar Midir;ET030604;;;; 3,335 ;;;;;;;;;;1; 3,335 
+Amahra;East Gojam;Hulet Ej Enese;ET030602;;;; 1,094 ;;;;;;;;;;1; 1,094 
+Amahra;East Gojam;Mota Town;ET030694;;;; 4,349 ;;;;;;;;;;1; 4,349 
+Tigray;Southern;Alamata;ET010407;;485; 1 ;;;;;;1; 1 ; 740 ;;;5; 246 
+SNNPR;Gamo Gofa;Bonke;ET071013; 5,253 ;;;;;;;;1;;1;; 1 ;4; 1,314 
+Oromia;Arsi;Dodota;ET040805;;;;;;;;;1; 1 ;1;;;3; 1 
+Afar;Awsi (Zone 1);Aysaita;ET020103;; 15,880 ;;;;;;;1;; 7,500 ; 750 ;;4; 6,033 
+Afar;Awsi (Zone 1);Mile;ET020105;;1860;;;;;;;1; 1 ;1;;;4; 466 
+Oromia;Arsi;Hitosa;ET040807;;;;;;;;;1; 1 ;1;;;3; 1 
+Afar;Gabi (Zone 3);Dulecha;ET020304;;;;;;; 6,380 ;1;1;; 2,605 ;;;4; 2,247 
+Afar;Gabi (Zone 3);Gewane;ET020303;;;;;;; 16,423 ;1;1;; 3,355 ;;;4; 4,945 
+SNNPR;Gamo Gofa;Boreda;ET071004;;;;;;;;;1;;1;;;2; 1 
+SNNPR;Gamo Gofa;Daramalo;ET071009; 875 ;;;;;;;;;;;; 1 ;2; 438 
+Afar;Kilbati (Zone 2);Ab Ala;ET020203;; 1,800 ;;;;;;;1; 1 ;1;;;4; 451 
+Afar;Kilbati (Zone 2);Dalul;ET020206;;;;;;;;;1; 1 ;1;; 1 ;4; 1 
+Amahra;East Gojam;Shebel Bereta;ET030614;;;; 3,606 ;;;;;;;;;;1; 3,606 
+Amahra;North Gonder;Dembia;ET030111;;1; 483 ; 8,774 ;;;;;1;;1; 1 ;;6; 1,544 
+Amahra;North Gonder;Gonder Zuria;ET030110;;; 26 ; 990 ;;;;;1;;1;;;4; 255 
+Amahra;North Gonder;Chilga;ET030112;;;;;;;;;1;;1;;;2; 1 
+Amahra;North Gonder;Addi Arekay;ET030101;;;; 228 ;;;;;;;;;;1; 228 
+SNNPR;Gamo Gofa;Mirab Abaya;ET071005;;;;;;;;;1;;1;;;2; 1 
+Somali;Jarar;Degehabur;ET050302;;;;;1155;1;;;;;;;;2; 578 
+Amahra;North Gonder;Alfa;ET030115;;;; 1,800 ;;;;;;;;;;1; 1,800 
+Amahra;North Gonder;Dabat;ET030105;;;;;;;;;;;; 1 ;;1; 1 
+Amahra;North Gonder;Debark;ET030104;;;;;;;;;;;; 1 ;;1; 1 
+Oromia;Arsi;Merti;ET040801;;;;;;;;;1; 1 ; 1,000 ;;;3; 334 
+Tigray;Southern;Raya Azebo;ET010406;;1;;;;;;;1; 1 ; 2,500 ;;;4; 626 
+Oromia;Arsi;Seru;ET040811;;;;;;;;; 1 ; 8,047 ;1;;;3; 2,683 
+Somali;Jarar;Gashamo;ET050304;;;;;1650;;;;;;;;;1; 1,650 
+SNNPR;Gamo Gofa;Arba Minch Zuria;ET071016; 2,290 ;;;;;;;;;;;;;1; 2,290 
+Oromia;Arsi;Ziway Dugda;ET040806;;;;;;;;;1; 1 ; 2,000 ;;;3; 667 
+Oromia;Arsi;Inkolo Wabe;ET040824;;;;;;;;;;;1;;;1; 1 
+Oromia;Arsi;Jeju;ET040804;;;;;;;;;;;; 187 ;;1; 187 
+Oromia;Arsi;Limu Bilbilo;ET040818;;;;;;;;;;;; 11,000 ;;1; 11,000 
+Afar;Awsi (Zone 1);Dubti;ET020101;; 11,500 ;;;;;;;1;;1;;;3; 3,834 
+Oromia;Arsi;Tiyo;ET040816;;;;;;;;;;;;;;0;
+Oromia;Bale;Agarfa;ET041104;;;;;;;;;1;;1;; 1 ;3; 1 
+Tigray;Central;Kola Temben;ET010208;;790;;;;;;;1;;1;;;3; 264 
+Tigray;Central;Laelay Maychew;ET010205;;;;;;;;;1;;1; 2,849 ;;3; 950 
+Tigray;Central;Naeder Adet;ET010207;;300;;;;;;;1;;1;;;3; 101 
+Oromia;Bale;Gasera;ET041106;;;;;;;;;1;; 40 ;;;2; 21 
+Oromia;Bale;Gololcha Bale;ET041105;;;;;;;;;1;;1;;;2; 1 
+Oromia;Bale;Lege Hida;ET041107;;;;;352;;;;;; 745 ;;;2; 549 
+Oromia;Bale;Berbere;ET041114;;;;;;;;;;; 140 ;;;1; 140 
+Oromia;Bale;Ginir;ET041108;;;;;;;;;;; 485 ;;;1; 485 
+Oromia;Bale;Goro;ET041116;;;;;;;;;;;1;;;1; 1 
+Somali;Jijiga;Aw-bare;ET050205;;;;;;;;;;;;;;0;
+Afar;Fenti (Zone 4);Teru;ET020403;; 4,120 ;;;;;;;1;; 7,120 ;;;3; 3,747 
+Oromia;Bale;Seweyna;ET041118;;;;;;;;;;; 60 ;;;1; 60 
+Afar;Kilbati (Zone 2);Berahile;ET020205;;;;;;;;;1; 1 ;1;;;3; 1 
+Afar;Kilbati (Zone 2);Koneba;ET020202;;;;;;;;;1; 1 ;1;;;3; 1 
+Afar;Kilbati (Zone 2);Megale;ET020204;;;;;;;;;1; 1 ;1;;;3; 1 
+Somali;Korahe;Kebridehar;ET050502; 625 ;; 1,500 ; 1 ;;; 490 ;;; 9,581 ; 705 ;; 1 ;7; 1,843 
+SNNPR;Gamo Gofa;Dita;ET071008; 316 ;;;;;;;;;;;;;1; 316 
+Amahra;North Gonder;Lay Armacho;ET030108;;;; 4,503 ;;;;;;;;;;1; 4,503 
+Amahra;North Gonder;Tach Armacho;ET030120;;;; 128 ;;;;;;;;;;1; 128 
+Amahra;North Gonder;West Belesa;ET030116;;;; 1 ;;;;;;;;;;1; 1 
+SNNPR;Gedio;Kochere;ET070503; 876 ;1;;;;;;;;;;;;2; 439 
+SNNPR;Gurage;Mareko;ET070107;;;;;;;;;1;1; 5,874 ;;;3; 1,959 
+Somali;Korahe;Debeweyin;ET050504;;;;;;1;;;; 3,602 ; 1,779 ;; 1 ;4; 1,346 
+SNNPR;Hadiya;Shashogo;ET070204;;;; 1 ;;;;;1; 2,600 ; 10,861 ;;;4; 3,366 
+SNNPR;Hadiya;Limu;ET070203;;;;;;;;;1;;;;;1; 1 
+Amahra;North Gonder;East Belesa;ET030117;;;;;;;;;;;;;;0;
+Amahra;North Shewa(R3);Antsokiya;ET030507;;; 16 ; 22,188 ;;;;;1;;1;;;4; 5,552 
+Amahra;North Shewa(R3);Kewet;ET030512;;;; 1,290 ;;;;;1; 1 ; 29,472 ;;;4; 7,691 
+Tigray;Southern;Alaje;ET010404;;;;;;;;;1;;1; 1 ;;3; 1 
+Tigray;Southern;Endamehoni;ET010405;;3538;;;;;;;1;;1;;;3; 1,180 
+Amahra;North Shewa(R3);Ankober;ET030515;;;;;;;;;;; 540 ; 1 ;;2; 271 
+Somali;Korahe;Shilabo;ET050503; 3,685 ;;;;;;;;; 132 ; 491 ;;;3; 1,436 
+Oromia;Borena;Moyale;ET041210; 2,994 ;;;;;;;;; 1 ; 1,530 ;; 1 ;4; 1,132 
+Amahra;North Shewa(R3);Tarema Ber;ET030510;;;;;;;;;1;;1;;;2; 1 
+Tigray;Western;Kafta Humera;ET010501;;3500;;;;;;;1;;1;;;3; 1,167 
+SNNPR;KT;Kacha Bira;ET070304;;;;;;;;;1; 1,185 ;1;;;3; 396 
+Beneshangul Gumu;Asosa;Assosa;ET060303;;;;;;;;;1;;1;;;2; 1 
+Afar;Awsi (Zone 1);Afambo;ET020104;;;;;;;;;1;;1;;;2; 1 
+Afar;Awsi (Zone 1);Chifra;ET020106;;;;;;;;;1;;1;;;2; 1 
+Oromia;Borena;Abaya;ET041213;;;;;;;;;1;;1;;;2; 1 
+Oromia;Borena;Dehas;ET041220; 25 ;;;;;;;;;; 100 ;;;2; 63 
+Oromia;Borena;Dillo;ET041219;;;;;;;;;; 950 ; 190 ;;;2; 570 
+Oromia;Borena;Yabelo;ET041207;;;;;;;;;;; 3,060 ;; 1 ;2; 1,531 
+Oromia;Borena;Dugda Dawa;ET041215;;;;;;;;;;; 1,250 ;;;1; 1,250 
+Oromia;East Harareg;Bedeno;ET041013; 465 ;;;;;;;;;; 8,755 ; 1 ;;3; 3,074 
+Oromia;East Harareg;Deder;ET041011; 4,323 ;;;;;;;;;; 13,250 ; 1 ;;3; 5,858 
+Tigray;Central;Adwa;ET010204;;;;;;;;;1;;1;;;2; 1 
+Tigray;Central;Ahferom;ET010202;;;;;;;;;1;;1;;;2; 1 
+Tigray;Central;Degua Temben;ET010604;;;;;;;;;1;;1;;;2; 1 
+Tigray;Central;Mereb Leke;ET010201;;;;;;;;;1;;1;;;2; 1 
+Tigray;Central;Tahtay Maychew;ET010206;;;;;;;;;1;;1;;;2; 1 
+Tigray;Central;Tanqua Abergele;ET010210;;;;;;;;;1;;1;;;2; 1 
+Tigray;Central;Werei Leke;ET010203;;;;;;;;;1;;1;;;2; 1 
+Amahra;North Shewa(R3);Ensaro;ET030503;;;;;;;;;;;; 1 ;;1; 1 
+Oromia;East Harareg;Jarso;ET040108; 138 ;;;;;;;;;; 7,180 ; 1 ;;3; 2,440 
+Oromia;East Harareg;Babile;ET041004;;;;;;;;;1;;1;;;2; 1 
+Oromia;East Harareg;Chinaksen;ET041015;;;;;1518;;;;;; 1,200 ;;;2; 1,359 
+Oromia;East Harareg;Golo Oda;ET041017;;;;;;;;;;; 980 ;; 1 ;2; 491 
+Oromia;East Harareg;Goro Gutu;ET041010; 166 ;;;;;;;;;;; 1 ;;2; 84 
+Oromia;East Harareg;Gursum;ET041003;;;;;;;;;;; 4,750 ; 1 ;;2; 2,376 
+Oromia;East Harareg;Haro Maya;ET041006; 1,435 ;;;;;;;;;; 3,305 ;;;2; 2,370 
+Oromia;East Harareg;Meta;ET041009; 1,128 ;;;;;;;;;; 1,400 ;;;2; 1,264 
+Tigray;Eastern;Kelete Awelallo;ET010306;;20;;;;;;;;;; 7,975 ;;2; 3,998 
+Somali;Liben;Moyale;ET050903;;;;;;;;;;;;; 1 ;1; 1 
+Afar;Fenti (Zone 4);Yalo;ET020404;;;;;;;;;1;;1;;;2; 1 
+SNNPR;KT;Kediada Gambela;ET070303;;;;;;;;;1; 2,326 ; 23,443 ;;;3; 8,590 
+SNNPR;KT;Hadero Tubito;ET070305;;;;;;;;;1;;1;;;2; 1 
+SNNPR;KT;Daniboya;ET070307;;;;;;;;;;; 7,025 ;;;1; 7,025 
+SNNPR;Segen Peoples';Amaro;ET071302;;;;;;;;;; 1 ;;;;1; 1 
+Oromia;East Harareg;Fedis;ET041005;;;;;;;;;;; 340 ;;;1; 340 
+SNNPR;Segen Peoples';Shay Bench;ET071303; 345 ;;;;;;;;;;;;;1; 345 
+Hareri;Hareri;Harar;ET130101; 4,580 ;;;;;;;;; 1 ;;;;2; 2,291 
+SNNPR;Selti;Lanfero;ET072003;;;;;;;;;1; 1 ; 22,616 ; 66 ;;4; 5,671 
+Amahra;North Shewa(R3);Gishe Rabel;ET030506;;;; 21 ;;;;;;;;;;1; 21 
+Amahra;North Shewa(R3);Menz Gera Midir;ET030505;;;; 80 ;;;;;;;;;;1; 80 
+Amahra;North Shewa(R3);Menz Keya Gabriel;ET030521;;;; 23 ;;;;;;;;;;1; 23 
+Amahra;North Shewa(R3);Menz Lalo Midir;ET030522;;;; 1 ;;;;;;;;;;1; 1 
+Oromia;East Harareg;Goro Muti;ET041089;;;;;;;;;;;; 1 ;;1;
+Oromia;East Harareg;Kersa;ET040405;;;;;;;;;;; 135 ;;;1; 135 
+Oromia;East Harareg;Kombolcha;ET041001; 153 ;;;;;;;;;;;;;1; 153 
+Oromia;East Harareg;Kumbi;ET041098;;;;;;;;;;; 1,400 ;;;1; 1,400 
+Amahra;North Shewa(R3);Menz Mama Midir;ET030509;;;; 1 ;;;;;;;;;;1; 1 
+Amahra;North Shewa(R3);Shoa Robit;ET030595;;;; 1,920 ;;;;;;;;;;1; 1,920 
+Amahra;North Shewa(R3);Assagirt;ET030514;;;;;;;;;;;;;;0;
+SNNPR;Selti;Sankura;ET072006; 970 ;;;;;;;;1;; 9,462 ;;;3; 3,478 
+Somali;Shabelle;Kelafo;ET050605; 22,235 ;; 19,200 ; 1 ;14575; 1 ; 46,151 ;1;1; 90,954 ; 100,506 ;; 58,713 ;11; 32,031 
+Somali;Shabelle;Mustahil;ET050606; 35,317 ;; 21,000 ; 1 ;;1; 44,330 ;1;1; 28,050 ; 43,140 ;; 34,375 ;10; 20,622 
+Tigray;South East;Saharti Samre;ET010601;;;;;;;;;1;;65;;;2; 33 
+SNNPR;Selti;Dalocha;ET072005;;;;;;;;;1;; 5,385 ;;;2; 2,693 
+SNNPR;Sidama;Loka Abaya;ET070414; 4,103 ;;;;297;;;;1; 3,675 ; 6,402 ;; 1 ;6; 2,413 
+SNNPR;Sidama;Hawassa Zuria;ET070402; 6,624 ;;;;;;;;1;; 18,569 ;;;3; 8,398 
+Oromia;East Harareg;Malka Balo;ET041012;; 1,050 ;;;;;;;;;;;;1; 1,050 
+Amahra;North Shewa(R3);Merahbete;ET030502;;;;;;;;;;;;;;0;
+Amahra;North Shewa(R3);Mimo Weremo;ET030501;;;;;;;;;;;;;;0;
+Tigray;Southern;Enderta;ET010602;;;;;;;;;1;;1;;;2; 1 
+Tigray;Southern;Hintalo Wejirat;ET010603;;;;;;;;;1;;1;;;2; 1 
+Tigray;Southern;Ofla;ET010408;;;;;;;;;1;; 20 ;;;2; 11 
+Amahra;North Wollo;Habru;ET030308;;31255;; 6,291 ;;;;;1; 1 ; 104 ;;;5; 7,530 
+Amahra;North Wollo;Guba Lafto;ET030307;;;; 24,771 ;;;;;1; 1 ;1;;;4; 6,194 
+Amahra;North Wollo;Gidan;ET030303;;;; 12,917 ;;;;;1;; 242 ;;;3; 4,387 
+Amahra;North Wollo;Meket;ET030304;;;; 615 ;;;;;1;;1;;;3; 206 
+Amahra;North Wollo;Bugna;ET030301;;;;;;;;;1;;1;;;2; 1 
+Oromia;East Shewa;Adama;ET040703;;;;;;;;;1; 1 ;1;;;3; 1 
+SNNPR;Sidama;Boricha;ET070410; 4,103 ;;;;;;;;;; 675 ;;;2; 2,389 
+SNNPR;Sidama;Wondo-Genet;ET070420;;;;;;;;;; 1 ;;;;1; 1 
+Somali;Shabelle;East Imi;ET050601;;; 1 ; 1 ;;; 35,442 ;1;1; 611 ;1;; 4,142 ;8; 5,025 
+Somali;Shabelle;Ferfer;ET050607;;;; 1 ;; 1 ; 41,036 ;1;1;; 1,500 ;; 8,250 ;7; 7,256 
+Oromia;East Shewa;Dugda;ET040707;;;;;;;;;1; 1 ;1;;;3; 1 
+Oromia;East Shewa;Lome;ET040704;;;;;;;;;1; 1 ;1;;;3; 1 
+Oromia;East Shewa;Boset;ET040702;;;;;;;;;1;;1;;;2; 1 
+Oromia;East Shewa;Fentale;ET040701;;;;;;;;;;;; 1 ;;1; 1 
+Afar;Awsi (Zone 1);Adaa'r;ET0201051;; 1,200 ;;;;;;;;;;;;1; 1,200 
+Oromia;East Shewa;Liben Chukala;ET040711;;;;;;;;;;;; 1 ;;1; 1 
+Oromia;East Shewa;Adami Tulu Jido Kombolcha;ET040708;;;;;;;;;;;;;;0;
+Oromia;East Wellega;Limu;ET040201;;;;;;;;;1;;;;;1; 1 
+Oromia;East Wellega;Qodal;#N/A;;;;;;;;;;;; 1 ;;1; 1 
+Oromia;East Wellega;Dega;ET040304;;;;;;;;;;;; 715 ;;1; 715 
+Somali;Shabelle;Adadle;ET050602;;;;;;; 1,496 ;1;1;;1;; 4,252 ;5; 1,150 
+Somali;Shabelle;Gode;ET050604;;; 2,880 ; 1 ;;;;1;1;;1;;;5; 577 
+Amahra;North Wollo;Wadla;ET030305;;;; 8,346 ;;;;;;;1;;;2; 4,174 
+Amahra;North Wollo;Lasta;ET030310;;;; 4,178 ;;;;;;;;;;1; 4,178 
+Amahra;North Wollo;Dawunt;ET030311;;;;;;;;;;;;;;0;
+Amahra;North Wollo;Delanta;ET030306;;;;;;;;;;;;;;0;
+Amahra;Oromia;Dewa Cheffa;ET031001;;690;; 7,415 ;;;;;1;;1;;;4; 2,027 
+Amahra;Oromia;Artuma Fursi;ET031004;;;; 10,895 ;;;;;1;;1;;;3; 3,632 
+Oromia;Guji;Liben;ET041407; 357 ;;;;;;;;1;;1;;;3; 120 
+Oromia;Guji;Adola;ET041403;;;;;;;;;;; 4,975 ;; 1 ;2; 2,488 
+Oromia;Guji;Goro Dola;ET041413;;;;;;;;;;; 175 ;;;1; 175 
+Oromia;Guji;Hambela Wamena;ET041409;;;;;;;;;;; 370 ;;;1; 370 
+Oromia;Guji;Wadera;ET041404;;;;;;;;;;;;;;0;
+Oromia;Ilubabor;Becho;ET040307;;;;;;;;;1;;1;;;2; 1 
+Oromia;Kelem Wellega;Hawa Galan;ET041801;;;;;;;;;;; 120 ;;;1; 120 
+Oromia;Kelem Wellega;Jimma Horo;ET041810;;;;;;;;;;; 319 ;;;1; 319 
+Oromia;North shewa;Debre libanos;ET040607;;;;;;;;;;;; 1,672 ;;1; 1,672 
+Oromia;North shewa;Liban Jawi;ET040597;;;;;;;;;;;; 110 ;;1;
+Oromia;North Shewa(R4);Dera;ET040602;;18639;;;;;;;1;;;;;2; 9,320 
+Oromia;North Shewa(R4);Gerar Jarso;ET040606;;;;;;;;;1;;1;;;2; 1 
+Tigray;Eastern;Gulomekeda;ET010301;;;;;;;;;;; 65 ;;;1; 65 
+Somali;Shabelle;Denan;ET050603;;; 700 ; 1 ;;;;;;;;;;2; 351 
+SNNPR;South Omo;Dasenech (Kuraz);ET070706;;;;;;;;1;1;;1;;;3; 1 
+SNNPR;South Omo;Hamer;ET070704; 1,779 ;;;;;;;;1;;1;;;3; 594 
+SNNPR;South Omo;Gelila;ET070703;;;;;;;;;1;;1;;;2; 1 
+SNNPR;South Omo;Gnangatom;ET070708;;;;;;;;;1;;1;;;2; 1 
+Oromia;North Shewa(R4);Kembibit;ET040610;;;;;;;;;1;;1;;;2; 1 
+Oromia;North Shewa(R4);Yaya Gulele;ET040614;;;;;;;;;1;;1;;;2; 1 
+SNNPR;South Omo;South Ari (Bako Gazer);ET070702;;;;;;;;;1;;1;;;2; 1 
+Somali;Shabelle;Aba-korow;ET050699;;;;;;;;;;;;; 259 ;1; 259 
+Oromia;North Shewa(R4);Kuyu;ET040604;;;;;;;;;;; 1,715 ;;;1; 1,715 
+Oromia;Oromia special zone;Alem Gena;ET041306;;;;;;;;;;;; 1 ;;1; 1 
+SNNPR;South Omo;Bena Tsemay;ET070705; 1,909 ;;;;;;;;;;;;;1; 1,909 
+Somali;Shabelle;Berocano;ET050696;;;;;;;;;;;;; 4,675 ;1; 4,675 
+Somali;Siti;Shinile;ET050103;;;;;;; 600 ;;1;; 50 ;; 1 ;4; 163 
+Somali;Siti;Erer;ET130105;;;;;;1;;;1;; 2,746 ;;;3; 916 
+Amahra;Oromia;Jille Timuga;ET031003;;;;;;;;;1;; 1,265 ;;;2; 633 
+Amahra;Oromia;Dewa Harewa;ET031005;;8805;;;;;;;;;;;;1; 8,805 
+Amahra;Oromia;Kemisie Town;ET031006;;;; 3,025 ;;;;;;;;;;1; 3,025 
+Amahra;South Gonder;Dera;ET030209;;18639; 400 ; 395 ;;;;;1;;1;;;5; 3,887 
+Amahra;South Gonder;Fogera;ET030203;;1; 1,522 ;;;;;;1;;1;;;4; 381 
+Amahra;South Gonder;Libo Kemkem;ET030202;;1;; 7,541 ;;;;;1;; 2,550 ;;;4; 2,523 
+Amahra;South Gonder;Simada;ET030207;;;;;;;;;1; 1 ;1; 1 ;;4; 1 
+Oromia;South West Shewa;Ilu;ET041305;;16680;;;;;;;1;;1; 1 ;;4; 4,171 
+Oromia;South West Shewa;Becho;ET041309;;;;;;;;;1;;1;;;2; 1 
+Amahra;South Gonder;Farta;ET030204;;1;;;;;;;;;;;;1; 1 
+Amahra;South Gonder;Tach gayint;ET030206;;;;;;;;;;;; 1 ;;1; 1 
+Amahra;South Wollo;kalu;ET030407;;8540; 4 ; 1 ;;;;;1;;1;;;5; 1,709 
+Amahra;South Wollo;Thehulederie;ET030405;;60149; 1 ; 1 ;;;;;1;;1;;;5; 12,031 
+Amahra;South Wollo;Ambasel;ET030404;;;; 1 ;;;;;1;;1;;;3; 1 
+Amahra;South Wollo;Dessie Zuria;ET030409;;;; 1 ;;;;;1;;1;;;3; 1 
+Amahra;South Wollo;Legehida;ET030420;;;; 1 ;;;;;1;;1;;;3; 1 
+Oromia;South West Shewa;Wenchi;ET041302;;;;;;;;;;;; 1 ;;1; 1 
+Tigray;North West;Tahtay Adiyabo;ET010101;;;;;;;;;;;; 2,475 ;;1; 2,475 
+Tigray;North West;Tahtay Koraro;ET010104;;;;;;;;;;;; 512 ;;1; 512 
+Amahra;South Wollo;Albuko;ET030408;;;; 1 ;;;;;;;; 1 ;;2; 1 
+Amahra;South Wollo;Jama;ET030414;;;; 1 ;;;;;;;1;;;2; 1 
+Amahra;South Wollo;Debresina;ET030412;;;;;;;;;;;; 1 ;;1; 1 
+Oromia;West Arsi;Shalla;ET041702; 16,119 ;;;;;;;;1;; 14,080 ;;;3; 10,067 
+SNNPR;Wolayita;Humbo;ET070604; 2,700 ;;;;2310;;;;1; 1 ; 2,750 ;;;5; 1,552 
+SNNPR;Wolayita;Diguna Fango;ET070612;;;;;;;;;1; 1,254 ; 405 ;;;3; 553 
+Somali;Siti;Afdem;ET050106;;;;;;;;;1;;1;;;2; 1 
+Somali;Siti;Miesso;ET050107;;;;;;;;;1;; 405 ;;;2; 203 
+SNNPR;Wolayita;Damot Weydie;ET070603;;;;;;;;;1;;1;;;2; 1 
+Somali;Siti;Dembel;ET050102;;;;;;;;;;; 15 ;;;1; 15 
+Amahra;South Wollo;Kombolcha Town;ET030417;;;;;;;;;;; 1,766 ;;;1; 1,766 
+Amahra;South Wollo;Legambo;ET030410;;;;;;;;;;;; 1 ;;1; 1 
+SNNPR;Wolayita;Kindo Dida;ET070610;;;;;;;;;1;; 36,075 ;;;2; 18,038 
+Oromia;West Arsi;Siraro;ET041701; 14,987 ;;;;;;;;1;; 78,680 ;;;3; 31,223 
+Amahra;South Wollo;Mehal Sayint;ET030419;;;; 1 ;;;;;;;;;;1; 1 
+Amahra;South Wollo;Tenta;ET030402;;3645;;;;;;;;;;;;1; 3,645 
+Amahra;South Wollo;Argoba;ET031201;;;;;;;;;;;;;;0;
+Amahra;South Wollo;Kelela;ET030413;;;;;;;;;;;;;;0;
+Amahra;South Wollo;Kutaber;ET030403;;;;;;;;;;;;;;0;
+Amahra;South Wollo;Mekdela;ET030401;;;;;;;;;;;;;;0;
+Somali;Siti;Ayisha;ET050101;;;;;;;;;;;;;;0;
+Oromia;West Arsi;Shashemene Zuria;ET041712;;;;;;;;;1;;1;;;2; 1 
+Oromia;West Arsi;Adaba;ET041710;;;;;;;;;;; 385 ;;;1; 385 
+Oromia;West Arsi;Arsi Negele;ET041703;;;;;;;;;;; 6,655 ;;;1; 6,655 
+Oromia;West Arsi;Dodola;ET041707;;;;;;;;;;; 2,025 ;;;1; 2,025 
+Amahra;South Wollo;Sayint;ET030411;;;;;;;;;;;;;;0;
+Amahra;South Wollo;Were Ilu;ET030415;;;;;;;;;;;;;;0;
+Amahra;South Wollo;Worebabu;ET030406;;;;;;;;;;;;;;0;
+Oromia;West Arsi;Shashemene Town;ET041711;;;;;;;;;;; 6,765 ;;;1; 6,765 
+Oromia;West Guji;Gelana;ET041217; 5,000 ;;;;;;;;1;;1;; 1 ;4; 1,251 
+Oromia;West Harerge;Kuni;ET040911; 280 ;;;;2365;;;;1; 16,000 ; 140,000 ;;;5; 31,729 
+Oromia;West Harerge;Habro;ET040908; 675 ;;;;;;;;1;;1;;;3; 226 
+Oromia;West Harerge;"Hawi Gudina
+";ET040915;;;;;;;;;1;; 1,815 ;;;2; 908 
+SNNPR;Wolayita;Boloso sore;ET070601;;;;;;;;;; 1 ;;;;1; 1 
+Oromia;West Harerge;Mieso;ET040901;;;;;;;;;; 1 ;;;;1; 1 
+Oromia;West Harerge;Tulo;ET040903;;;;;3795;;;;;;;;;1; 3,795 
+Oromia;West Harerge;Anchar;ET040906;;;;;;;;;;;;;;0;
+Oromia;West Shewa;Ejere (Addis Alem);ET040511;;;;;;;;;;;; 1 ;;1; 1 
+Afar;Fenti (Zone 4);Awra;ET020401;;;;;;;;;;;;;;0;
+Afar;Fenti (Zone 4);Ewa;ET020402;;;;;;;;;;;;;;0;
+Oromia;West Shewa;Ejersa Lafo;ET040590;;;;;;;;;;;; 1 ;;1; 1 
+Afar;Hari (Zone 5);Dalfagi;ET020504;;;;;;;;;;;;;;0;
+Afar;Hari (Zone 5);Telalak;ET020501;;;;;;;;;;;;;;0;
+Somali;Warder;Warder;ET050704; 2,813 ;;;;;; 6,600 ;;;;;; 1 ;3; 3,138 
+Afar;Kilbati (Zone 2);Afdera;ET020207;;;;;;;;;;;;;;0;
+Afar;Kilbati (Zone 2);Erebti;ET020201;;;;;;;;;;;;;;0;
+Amahra;Wag Himra;Dehana;ET030803;;;; 1 ;;;;;1;;1;;;3; 1 
+Amahra;Wag Himra;Gaz Gibla;ET030804;;;; 1 ;;;;;;;; 1 ;;2; 1 
+Amahra;Wag Himra;Sekota;ET030802;;;; 1 ;;;;;;;; 1 ;;2; 1 
+Amahra;Wag Himra;Ziquala;ET030801;;; 1 ;;;;;;;;; 1 ;;2; 1 
+Amahra;Wag Himra;Abergele;ET030805;;;; 1 ;;;;;;;;;;1; 1 
+Amahra;Wag Himra;Sahla;ET030806;;;;;;;;;;;;;;0;
+Somali;Warder;Lehel-Yucub;ET050798;;;;;;;;;;;;; 440 ;1; 440 
+Amahra;West Gojam;Bahirdar Zuria;ET030702;;;; 2,278 ;;;;;1;;1;;;3; 760 
+Amahra;West Gojam;Dega Damot;ET030707;;;; 1 ;;;;;1;;1;;;3; 1 
+Amahra;West Gojam;Debub Achefer;ET030713;;;;;;;;;1;;1;;;2; 1 
+Amahra;West Gojam;Mecha;ET030704;;1;; 1 ;;;;;;;;;;2; 1 
+Amahra;West Gojam;Semen Achefer;ET030701;;;;;;;;;1;;1;;;2; 1 
+Amahra;West Gojam;Bure;ET030710;;1960;;;;;;;;;;;;1; 1,960 
+Amahra;West Gojam;Sekela;ET030705;;;; 1 ;;;;;;;;;;1; 1 
+Amahra;West Gojam;Yilmana Densa;ET030703;;; 1 ;;;;;;;;;;;1;
+Oromia;West Wollega;Gudetu Kondole;ET040109;;;;;;;;;;;; 2,728 ;;1; 2,728 
