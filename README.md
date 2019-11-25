@@ -29,3 +29,7 @@
       └── region_model.R                       # Main code for the trigger model. This code will use all the other codes in the script folder 
 ### Notes      
 To run catchment extractor script addtional data is needed - this can be found in the following link https://rodekruis.sharepoint.com/:f:/s/510-CRAVK-510/EhG4P2uRQRZKjZiJlo7YMYwBs5sqYxzcHmElbF4GtCGF6Q?e=g2mdMV
+
+## GLOFAS data
+The orgional datasets for Glofas are in Teams 
+https://rodekruis.sharepoint.com/sites/510-CRAVK-510/Gedeelde%20%20documenten/FbF%20-%20Mali%20-%20RPII/Trigger%20methodology/glofas2.nc.tar
