@@ -60,4 +60,4 @@ glofas_data <- make_glofas_district_matrix(glofas_data, country)
 df <- df %>%
   left_join(glofas_data, by = c("district", "date"))
 
-write.csv("scripts/shiny_uganda_data_explorer/data/shiny_explorer_input.csv", row.names = F)
+write.csv(df, "scripts/shiny_uganda_data_explorer/data/shiny_explorer_input.csv", row.names = F)

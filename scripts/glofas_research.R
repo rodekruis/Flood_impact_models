@@ -4,16 +4,13 @@ library(zoo)
 source('scripts/prepare_glofas_data.R')
 
 # Read and prep glofas files
-glofas_data <- prep_glofas_data()
+glofas_data <- prep_glofas_data("uganda")
 
 # Exploratotory analysis
 glofas_data %>%
   group_by(station) %>%
   summarise(amount = n(),
             avg = mean(dis))
-
-glofas_data %>%
-  ggplot(aes(x = date, y = dis)) + geom_bar(stat="identity") + facet_wrap(~station)
 
 # Glofas data is not available for every date so make a complete calendar and fill missings
 glofas_filled <- tibble(date = seq(min(glofas_data$date), max(glofas_data$date), by = "1 day"))

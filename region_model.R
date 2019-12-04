@@ -12,7 +12,7 @@ source('settings.R')
 
 
 # -------------------- Settings -------------------------------
-country <- "kenya"
+country <- "uganda"
 produce_new_rainfall_csv <- FALSE
 include_anomaly <- FALSE
 # regions <- c("Busia")  # A vector of districts, e.g. c("KAMPALA", "KASESE"). If the vector is empty, i.e. c(), it takes all regions 
@@ -31,13 +31,14 @@ rainfall <- read.csv(file.path("raw_data", country, paste0("rainfall_", country,
 impact_data <- read_csv(file.path("raw_data", country, "impact_data.csv"))
 impact_data <- impact_data %>%
   mutate(flood = 1,
-         district = as.character(district)) %>% 
+         district = as.character(district),
+         date = as_date(date)) %>% 
   dplyr::select(date, district, flood)
 
 
 # -------------------- Mutating, merging and aggregating -------
 catchment_id_column <- country_settings[[country]][["catchment_id_column"]]
-rainfall <- rainfall %>% rename("district" = catchment_id_column)
+if (!"district" %in% names(rainfall)) {rainfall <- rainfall %>% rename("district" = catchment_id_column)}
 rainfall <- create_extra_rainfall_vars(rainfall, moving_avg = FALSE, anomaly = FALSE)
 
 # See documentation for regions in settings above
