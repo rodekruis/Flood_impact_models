@@ -2,10 +2,10 @@
 *.Rhistory
 *.RData
 *.Ruserdata
-*.Rproj
 *.tif.gz
 *.tif
 .Rproj.user
 *.grd
 *.gri
 *.pdf
+*shiny_explorer_input.csv

@@ -22,3 +22,4 @@ server <- function(input, output) {
     p
   })
 }
+
