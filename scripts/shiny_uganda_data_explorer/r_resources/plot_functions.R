@@ -29,5 +29,3 @@ plot_glofas <- function(df){
   p <- ggplotly(p)
   return(p)
 }
-
-plot(rainfall$anomaly)
