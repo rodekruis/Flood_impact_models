@@ -15,8 +15,8 @@ source('settings.R')
 country <- "uganda"
 produce_new_rainfall_csv <- FALSE
 include_anomaly <- FALSE
-# regions <- c("Busia")  # A vector of districts, e.g. c("KAMPALA", "KASESE"). If the vector is empty, i.e. c(), it takes all regions 
-regions = c()
+# districts <- c("BUSIA")  # A vector of districts, e.g. c("KAMPALA", "KASESE"). If the vector is empty, i.e. c(), it takes all regions 
+districts <- c("KATAKWI")
 
 # -------------------- Data Extracting/Loading -------------------------
 
@@ -31,7 +31,7 @@ rainfall <- read.csv(file.path("raw_data", country, paste0("rainfall_", country,
 impact_data <- read_csv(file.path("raw_data", country, "impact_data.csv"))
 impact_data <- impact_data %>%
   mutate(flood = 1,
-         district = as.character(district),
+         district = str_to_title(as.character(district)),
          date = as_date(date)) %>% 
   dplyr::select(date, district, flood)
 
@@ -42,9 +42,9 @@ if (!"district" %in% names(rainfall)) {rainfall <- rainfall %>% rename("district
 rainfall <- create_extra_rainfall_vars(rainfall, moving_avg = FALSE, anomaly = FALSE)
 
 # See documentation for regions in settings above
-if (length(regions) != 0) {
+if (length(districts) != 0) {
   rainfall <- rainfall %>%
-    filter(!!as.symbol(catchment_id_column) %in% regions)
+    filter(district %in% districts)
 }
 
 if (include_anomaly) {
@@ -58,7 +58,7 @@ if (include_anomaly) {
 }
 
 df <- rainfall %>%
-  mutate(district = as.character(district)) %>%
+  mutate(district = str_to_title(as.character(district))) %>%
   left_join(impact_data %>% dplyr::select(district, date, flood), by = c('district', 'date'))
 
 # Add glofas dta
@@ -106,3 +106,4 @@ confusionMatrix(predict(model2, type = "class"), reference=as.factor(df_model$fl
 rpart.plot(model2, type = 2, extra=1)
 
 fancyRpartPlot(model2, cex=0.7)
+
