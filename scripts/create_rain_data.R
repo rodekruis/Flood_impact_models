@@ -129,3 +129,8 @@ create_extra_rainfall_vars <- function(rainfall, many_vars=FALSE, moving_avg=TRU
   return(rainfall)
 }
 
+# Running the rainfall extraction is commented out because it will take a very long time and should only be done once
+
+# create_country_tifs("uganda", country_settings)
+# create_yearly_raster_stacks("uganda", country_settings)
+# extract_rain_data_for_shapes("uganda", country_settings)
