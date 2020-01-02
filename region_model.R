@@ -15,8 +15,9 @@ source('settings.R')
 country <- "uganda"
 produce_new_rainfall_csv <- FALSE
 include_anomaly <- FALSE
-# districts <- c("BUSIA")  # A vector of districts, e.g. c("KAMPALA", "KASESE"). If the vector is empty, i.e. c(), it takes all regions 
+# districts <- c("Busia")  # A vector of districts, e.g. c("KAMPALA", "KASESE"). If the vector is empty, i.e. c(), it takes all regions 
 districts <- c("KATAKWI")
+catchment_id_column <- country_settings[[country]][["catchment_id_column"]]
 
 # -------------------- Data Extracting/Loading -------------------------
 
@@ -26,19 +27,18 @@ if (produce_new_rainfall_csv) {
 }
 
 rainfall <- read.csv(file.path("raw_data", country, paste0("rainfall_", country, ".csv"))) %>%
-  mutate(date = as_date(date))
+  mutate(date = as_date(date),
+         !!sym(catchment_id_column) := as.character(!!sym(catchment_id_column)))
 
 impact_data <- read_csv(file.path("raw_data", country, "impact_data.csv"))
 impact_data <- impact_data %>%
   mutate(flood = 1,
          district = str_to_title(as.character(district)),
          date = as_date(date)) %>% 
-  dplyr::select(date, district, flood)
+  dplyr::select(date, district, !!sym(catchment_id_column), flood)
 
 
 # -------------------- Mutating, merging and aggregating -------
-catchment_id_column <- country_settings[[country]][["catchment_id_column"]]
-if (!"district" %in% names(rainfall)) {rainfall <- rainfall %>% rename("district" = catchment_id_column)}
 rainfall <- create_extra_rainfall_vars(rainfall, moving_avg = FALSE, anomaly = FALSE)
 
 # See documentation for regions in settings above
@@ -59,7 +59,7 @@ if (include_anomaly) {
 
 df <- rainfall %>%
   mutate(district = str_to_title(as.character(district))) %>%
-  left_join(impact_data %>% dplyr::select(district, date, flood), by = c('district', 'date'))
+  left_join(impact_data, by = c(catchment_id_column, 'date'))
 
 # Add glofas dta
 glofas_data <- prep_glofas_data(country)
@@ -67,7 +67,7 @@ glofas_data <- fill_glofas_data(glofas_data)  # Glofas data is only available ea
 glofas_data <- make_glofas_district_matrix(glofas_data, country)  
 
 df <- df %>%
-  left_join(glofas_data, by = c("district", "date"))
+  left_join(glofas_data, by = c(catchment_id_column, "date"))
 
 # ------------------- Simple decision tree model -----------------
 
