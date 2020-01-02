@@ -17,7 +17,7 @@ country <- "uganda"
 produce_new_rainfall_csv <- FALSE
 include_anomaly <- FALSE
 # districts <- c("Busia")  # A vector of districts, e.g. c("KAMPALA", "KASESE"). If the vector is empty, i.e. c(), it takes all regions 
-districts <- c("KATAKWI")
+districts <- c("Katakwi")
 catchment_id_column <- country_settings[[country]][["catchment_id_column"]]
 
 # -------------------- Data Extracting/Loading -------------------------
@@ -42,17 +42,17 @@ impact_data <- impact_data %>%
   dplyr::select(date, district, !!sym(catchment_id_column), flood)
 
 # Join district names from impact data to rainfall based on catchment_id_column, from then on use district
-df <- rainfall %>%
+rainfall <- rainfall %>%
   left_join(impact_data %>% dplyr::select(!!sym(catchment_id_column), district) %>% unique(), by = catchment_id_column)
 
 # -------------------- Mutating, merging and aggregating -------
 rainfall <- create_extra_rainfall_vars(rainfall, moving_avg = FALSE, anomaly = FALSE)
 
+# Join floods
 df <- rainfall %>%
-  left_join(impact_data %>% dplyr::select(!!sym(catchment_id_column), district) %>% unique(), by = catchment_id_column) %>%
   left_join(impact_data %>% dplyr::select(-district), by = c(catchment_id_column, 'date'))
 
-# See documentation for regions in settings above
+# Filter districts
 if (length(districts) != 0) {
   df <- df %>%
     filter(district %in% districts)
@@ -71,12 +71,10 @@ if (include_anomaly) {
 # Add glofas dta
 glofas_data <- prep_glofas_data(country)
 glofas_data <- fill_glofas_data(glofas_data)  # Glofas data is only available each three days, this will fill it
-glofas_data <- make_glofas_district_matrix(glofas_data, country) %>%
-  mutate(!!sym(catchment_id_column) := as.character(!!sym(catchment_id_column)))
-  
+glofas_data <- make_glofas_district_matrix(glofas_data, country)
 
 df <- df %>%
-  left_join(glofas_data, by = c(catchment_id_column, "date"))
+  left_join(glofas_data, by = c("district", "date"))
 
 # ------------------- Simple decision tree model -----------------
 
