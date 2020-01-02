@@ -1,4 +1,4 @@
-field_1,district,county,sub_county,ward,date,Date_year,human_impa,hh_impact,p_impact,lat,lon,Adm0Name,Adm2Name,Adm1Name,DSCodeAdm1,DSCodeAdm2
+field_1,HYBAS_ID,district,sub_county,ward,date,Date_year,human_impa,hh_impact,p_impact,lat,lon,Adm0Name,Adm2Name,Adm1Name,DSCodeAdm1,DSCodeAdm2
 742,1061135480,Busia,,,2002-05-13,2002,40,0,0,0.0796787,34.0430426,Kenya,Budalangi,Busia,KE40,KE400231
 756,1061135480,Busia,,,2006-05-18,2006,0,0,0,0.0796787,34.0430426,Kenya,Budalangi,Busia,KE40,KE400231
 732,1061135480,Busia,,,2006-11-14,2006,48,0,10,0.4349978,34.2474358,Kenya,Nambale,Busia,KE40,KE400227

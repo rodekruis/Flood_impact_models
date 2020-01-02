@@ -87,7 +87,7 @@ extract_rain_data_for_shapes <- function(country, country_settings, year_range=s
 
 # Central location to create extra rainfall vars
 create_extra_rainfall_vars <- function(rainfall, many_vars=FALSE, moving_avg=TRUE, anomaly=TRUE) {
-      
+
   rainfall <- rainfall %>%
     dplyr::rename(zero_shifts = rainfall) %>%
     arrange(district, date) %>%

@@ -37,8 +37,7 @@ make_glofas_district_matrix <- function(glofas_data, country) {
   glofas_data <- glofas_data %>%
     left_join(glofas_with_regions, by="station") %>%
     spread(station, dis) %>%
-    mutate(district = toupper(district)) %>%
-    arrange(district, date)
+    mutate(district = as.character(district))
   
   
   return(glofas_data)

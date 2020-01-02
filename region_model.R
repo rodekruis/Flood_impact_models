@@ -10,6 +10,7 @@ source('scripts/create_rain_data.R')
 source('scripts/prepare_glofas_data.R')
 source('settings.R')
 
+# Join district in first lines based on link code and use district in all other places
 
 # -------------------- Settings -------------------------------
 country <- "uganda"
@@ -26,24 +27,34 @@ if (produce_new_rainfall_csv) {
   extract_rain_data_for_shapes(country, country_settings)
 }
 
+# Read in rainfall data
 rainfall <- read.csv(file.path("raw_data", country, paste0("rainfall_", country, ".csv"))) %>%
   mutate(date = as_date(date),
          !!sym(catchment_id_column) := as.character(!!sym(catchment_id_column)))
 
+# Read impact data
 impact_data <- read_csv(file.path("raw_data", country, "impact_data.csv"))
 impact_data <- impact_data %>%
   mutate(flood = 1,
          district = str_to_title(as.character(district)),
+         !!sym(catchment_id_column) := as.character(!!sym(catchment_id_column)),
          date = as_date(date)) %>% 
   dplyr::select(date, district, !!sym(catchment_id_column), flood)
 
+# Join district names from impact data to rainfall based on catchment_id_column, from then on use district
+df <- rainfall %>%
+  left_join(impact_data %>% dplyr::select(!!sym(catchment_id_column), district) %>% unique(), by = catchment_id_column)
 
 # -------------------- Mutating, merging and aggregating -------
 rainfall <- create_extra_rainfall_vars(rainfall, moving_avg = FALSE, anomaly = FALSE)
 
+df <- rainfall %>%
+  left_join(impact_data %>% dplyr::select(!!sym(catchment_id_column), district) %>% unique(), by = catchment_id_column) %>%
+  left_join(impact_data %>% dplyr::select(-district), by = c(catchment_id_column, 'date'))
+
 # See documentation for regions in settings above
 if (length(districts) != 0) {
-  rainfall <- rainfall %>%
+  df <- df %>%
     filter(district %in% districts)
 }
 
@@ -53,18 +64,16 @@ if (include_anomaly) {
   anomalies$date <- as.Date(anomalies$date)
   anomalies <- anomalies %>% rename(anomaly = rainfall)
   
-  rainfall <- rainfall %>%
+  df <- df %>%
     left_join(anomalies %>% dplyr::select(date, anomaly), by="date") 
 }
-
-df <- rainfall %>%
-  mutate(district = str_to_title(as.character(district))) %>%
-  left_join(impact_data, by = c(catchment_id_column, 'date'))
 
 # Add glofas dta
 glofas_data <- prep_glofas_data(country)
 glofas_data <- fill_glofas_data(glofas_data)  # Glofas data is only available each three days, this will fill it
-glofas_data <- make_glofas_district_matrix(glofas_data, country)  
+glofas_data <- make_glofas_district_matrix(glofas_data, country) %>%
+  mutate(!!sym(catchment_id_column) := as.character(!!sym(catchment_id_column)))
+  
 
 df <- df %>%
   left_join(glofas_data, by = c(catchment_id_column, "date"))
