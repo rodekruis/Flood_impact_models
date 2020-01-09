@@ -19,6 +19,7 @@ from os.path import isfile, join
 import seaborn as sns
 import geopandas as gpd
 from shapely.geometry import Point
+from pandas.plotting import register_matplotlib_converters
 #%% Creating a fonction to normalize result
 
 def normalize(df):
@@ -86,45 +87,54 @@ print(Affected_admin2)
  #%% 
 # open the impacted_area and Glofas related files
 district_glofas=pd.read_csv("C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/AFFECTED_DIST_with_glofas_ABU.csv", encoding='latin-1')  
-df_districtGlofas= pd.DataFrame(district_glofas)
-
+df_dg= pd.DataFrame(district_glofas)
+df_dg=df_dg.set_index('name')
 
  #%%  
-############################################################ create plot per district 
+#create plot per district only for the district having recorded impact and for the related glofas stations per district
  
  
 for districts in Affected_admin2:
+    print('############')
+    print(districts)
     df_event1=df_event[df_event['Area']==districts]
     df_event1=df_event1['flood'] 
     df_y=pd.DataFrame()
-    for ele in stations_list:
-        flow=di[ele]['dis'].median(dim='ensemble').sel(step=1).drop(['step'])#.sel(ensemble=1,step=1) median of esemble variables
+    st= df_dg.loc[districts, 'Glofas_st':'Glofas_st4']
+    st= st.dropna()
+
+    for j in range(0,len(st)) : 
+        print(st[j])
+        flow=di[st[j]]['dis'].median(dim='ensemble').sel(step=1).drop(['step'])#.sel(ensemble=1,step=1) median of esemble variables
         flow_=flow.resample(time='1D').interpolate('linear')#asfreq()#.mean(dim='time')#sum()#reduce(np.sum)      
-        df_y[ele]=pd.Series(flow_.values.flatten())  
+        df_y[st[j]]=pd.Series(flow_.values.flatten())  
         df_y['time']=flow_['time'].values
         #df_y.set_index('time', inplace=True)
         #st = flow_['time'].values[0]
         #en = flow_['time'].values[-1]
-    dff=normalize(df_y.drop('time',axis=1))
-    dff['time']=df_y['time']
-    df = dff.melt('time', var_name='Stations',  value_name='dis')
-      
-    
-    fig = plt.figure(figsize=(16, 12),frameon=False, dpi=400)
-    ax1 = fig.add_subplot(1, 1, 1)
-    #df_y.plot(ax=ax1)
-    ax1.set_xlabel('Time (year)', fontsize=18)
-    ax1.set_ylabel('Scale flow', fontsize=18)
-    sns.lineplot(x="time", y="dis",  hue="Stations", data=df,ax=ax1)
-    for index, row in df_event1.iteritems():#iterrows():
-        if row==1:
-            ax1.axvline(x=index, color='y', linestyle='--')  
-    #ax1.text('2004-01-01',fontsize=18)
-    #ax1.text('2015-01-01',.8, '(Glofas Test for Admin =%s'%districts,fontsize=18,bbox=dict(facecolor='red', alpha=0.5))
-    ax1.set_title( '(Glofas Test for Admin =%s'%districts,fontsize=20,bbox=dict(facecolor='red', alpha=0.5))
-    #ax1.text(.25, .25, '(Glofas Test for Admin =%s'%districts,fontsize=18,bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='right', verticalalignment='bottom',  transform=ax1.transAxes)
-    fig.savefig('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/output/uganda/Glofas_Analysis/flow_impact_%s.png' %districts)
-    plt.clf()
+    try:
+        dff=normalize(df_y.drop('time',axis=1))
+        dff['time']=df_y['time']
+        df = dff.melt('time', var_name='Stations',  value_name='dis')
+          
+        
+        fig = plt.figure(figsize=(16, 12),frameon=False, dpi=400)
+        ax1 = fig.add_subplot(1, 1, 1)
+        #df_y.plot(ax=ax1)
+        ax1.set_xlabel('Time (year)', fontsize=18)
+        ax1.set_ylabel('Scale flow', fontsize=18)
+        sns.lineplot(x="time", y="dis",  hue="Stations", data=df,ax=ax1)
+        for index, row in df_event1.iteritems():#iterrows():
+            if row==1:
+                ax1.axvline(x=index, color='y', linestyle='--')  
+        #ax1.text('2004-01-01',fontsize=18)
+        #ax1.text('2015-01-01',.8, '(Glofas Test for Admin =%s'%districts,fontsize=18,bbox=dict(facecolor='red', alpha=0.5))
+        ax1.set_title( '(Glofas Test for Admin =%s'%districts,fontsize=20,bbox=dict(facecolor='red', alpha=0.5))
+        #ax1.text(.25, .25, '(Glofas Test for Admin =%s'%districts,fontsize=18,bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='right', verticalalignment='bottom',  transform=ax1.transAxes)
+        fig.savefig('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/output/uganda/Glofas_Analysis/flow_impact_%s.png' %districts)
+        plt.clf()
+    except:
+        continue
     #ax1.text(.75, .75, '(Glofas Test for Admin =%s'%districts,fontsize=18,bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='right', verticalalignment='bottom',  transform=ax1.transAxes)
  #%%
 print(df_event1.iteritems())
