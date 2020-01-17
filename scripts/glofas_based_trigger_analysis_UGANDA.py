@@ -20,7 +20,11 @@ import seaborn as sns
 import geopandas as gpd
 from shapely.geometry import Point
 from pandas.plotting import register_matplotlib_converters
-#%% Creating a fonction to normalize result
+import datetime
+from sklearn.metrics import confusion_matrix
+
+#%% functions definition 
+#Creating a fonction to normalize result
 
 def normalize(df):
     result = df.copy()
@@ -29,13 +33,44 @@ def normalize(df):
         min_value = df[feature_name].min()
         result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
     return result
+
+# compute confusion matrix and performance index functions
+
+def calc_pod(obs, pred):
+    corr_neg, false_al, misses, hits = confusion_matrix(obs, pred).ravel()    
+    POD = hits / (hits + misses)
+    return POD
+
+def calc_far(obs, pred):
+    corr_neg, false_al, misses, hits = confusion_matrix(obs, pred).ravel()    
+    FAR = false_al / (hits + false_al)
+    return FAR
+    
+def calc_pofd(obs, pred):
+    corr_neg, false_al, misses, hits = confusion_matrix(obs, pred).ravel()    
+    POFD = false_al / (false_al + corr_neg)
+    return POFD
+
+def calc_csi(obs, pred):
+    corr_neg, false_al, misses, hits = confusion_matrix(obs, pred).ravel()    
+    CSI = hits / (hits + false_al + misses)
+    return CSI
+
+def calc_performance_scores(obs, pred):
+    output = {}
+    output['pod'] = calc_pod(obs, pred)
+    output['far'] = calc_far(obs, pred)
+    output['pofd'] = calc_pofd(obs, pred)
+    output['csi'] = calc_csi(obs, pred)
+    
+    output = pd.Series(output)
+    return output
      
 #%%
-# open a glofas ncdf dataset on a seleted area in shapefile, then return in Csv all the glofas station data inside the shapefile.
-    
+# open a glofas ncdf dataset on a seleted area in shapefile, then return in Csv all the glofas station data inside the shapefile.   
 mypath='C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/Glofas_Africa_nc'
 onlyfiles = [ f for f in listdir(mypath) if isfile(join(mypath,f)) ]
-#%%
+
 # load admin shapefile for Uganda
 admin_shp = gpd.read_file('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/shapes/uga_admbnda_adm2/uga_admbnda_adm2_UBOS_v2.shp')  # load admin shape file for Mali
 di={}
@@ -44,7 +79,7 @@ stations_list=[]
 Lat_list=[]
 Lon_list=[]
 
-#%% takes time to run  !! = find in the glofas Africal global data, the station that are in the Uganda shapefile
+#%% takes time to run  !! 5 minutes = find in the glofas Africal global data, the station that are in the Uganda shapefile
 
 for files in onlyfiles:
     Filename = os.path.join(mypath,files)
@@ -62,37 +97,46 @@ for files in onlyfiles:
         di[stid]=data 
     data.close()
  
-#%% SAVE the selected glofas stations .nc files to .csv in a separated folder (every 3 days mean ensemble)
+#%% SAVE the selected glofas stations .nc files to .csv 
+df_total=pd.DataFrame(columns=['station', 'time', 'dis'])
 
 for station in stations_list:
+    # create .cv file per station of glofas  (every 3 days mean ensemble)
     df_y=pd.DataFrame(columns=['time', 'dis'])
     flow=di[station]['dis'].median(dim='ensemble').sel(step=1).drop(['step']) # median of esemble variables
     df_y['time']=flow['time'].values         
     df_y['dis']=pd.Series(flow.values.flatten())  
     df_y=df_y.set_index('time')
-   
     df_y.to_csv(('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/glofas/GLOFAS_data_for_%s.csv' %station))
+    
+    # create a combined .cv file for all station station of glofas with filled data every day
+    #df_z=pd.DataFrame(columns=['station', 'time', 'dis']) 
+    flow=di[station]['dis'].median(dim='ensemble').sel(step=1).drop(['step']) # median of esemble variables
+    flow_fill=flow.resample(time='1D').ffill()
+    df_z['time']=flow_fill['time'].values         
+    df_z['dis']=pd.Series(flow_fill.values.flatten())  
+    df_z['station']=station
+    df_total = df_total.append(df_z, ignore_index=True)
+    
+df_total=df_total.dropna()
+df_total.to_csv('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/glofas/GLOFAS_fill_allstation.csv', index=False)
 
-#%% Extracting Station information with lat and lon in a csv file and computing Glofas quantiles per station
+#%% Extracting Station information with lat and lon in a csv file and computing Glofas quantiles per station in these table. Save the table as .csv
 # Q90 correspond to a return period of (1/0.1) = 10 years    
 # Q95 correspond to a return period of (1/0.05) = 20 years  
 # Q98 correspond to a return period of (1/0.02) = 50 years  
     
 df_station=pd.DataFrame(columns=['Station', 'location', 'Lat','Lon', 'Q90', 'Q95', 'Q98'])
+df_station = df_station[['Station']].rename(columns={'Station': 'station'})
 
 for i in range(len(location_list)):
     station= stations_list[i]  
-    df_station.loc[i,'Station']= stations_list[i]
+    df_station.loc[i,'station']= stations_list[i]
     df_station.loc[i,'location']= location_list[i]
     df_station.loc[i,'Lon']= Lon_list[i]
     df_station.loc[i,'Lat']= Lat_list[i]
-    # Add GLOFAS quantile thresholds to the df_station table :
     try:                                
-        #using memory selected netcdf dataset 
-        #df_station.loc[i,'Q90']= di[station].dis.quantile(0.9).values
-        #df_station.loc[i,'Q95']= di[station].dis.quantile(0.95).values
-        #df_station.loc[i,'Q98']= di[station].dis.quantile(0.98).values
-        #using created .csv files daily mean
+
         gl_station=pd.read_csv('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/glofas/GLOFAS_data_for_%s.csv' %station)
         df_station.loc[i,'Q90']= gl_station.dis.quantile(0.9)
         df_station.loc[i,'Q95']= gl_station.dis.quantile(0.95)
@@ -103,29 +147,28 @@ for i in range(len(location_list)):
 df_station.to_csv('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/shapes/uga_glofas_stations/uga_glofas_station.csv')
 
     
-#%% Open the flood impact csv file and create a dataframe
+#%% Opening files
 
-flood_events=pd.read_csv("C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/impact_data.csv", encoding='latin-1')  # load impact data
-Affected_admin2=np.unique(flood_events['Area'].values)   # create a list of Area
-flood_events.index=flood_events['Date'] # create a list of event dates
-df_event=pd.DataFrame(flood_events)
+#Open the flood impact data .csv file and create a dataframe
+flood_events=pd.read_csv("C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/impact_data.csv", encoding='latin-1')  
+flood_events['Date']= pd.to_datetime(flood_events['Date'], format='%m/%d/%Y')                     # transforming date from string to datetime                                                        # create a list of event dates
+flood_events = flood_events[['Area', 'flood']].reset_index().rename(columns={'Date': 'time', 'Area': 'district'})
 
-print(flood_events.index)
-print(Affected_admin2)
-
-#%%  open the impacted_area and Glofas related stations per district files
-
-district_glofas=pd.read_csv("C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/AFFECTED_DIST_with_glofas_ABU.csv", encoding='latin-1')  
-df_dg= pd.DataFrame(district_glofas)
+#  open the impacted_area and Glofas related stations per district files
+df_dg=pd.read_csv("C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/AFFECTED_DIST_with_glofas_ABU.csv", encoding='latin-1')  
+df_dg_long = df_dg[['name', 'Glofas_st', 'Glofas_st2', 'Glofas_st3', 'Glofas_st4']].melt(id_vars='name', var_name='glofas_n', value_name='station').drop('glofas_n', 1).dropna()
+df_dg_long = df_dg_long.rename(columns = {'name': 'district'})
 df_dg=df_dg.set_index('name')
- 
-#create plot per district only for the district having recorded impact and for the related glofas stations per district
- 
+
+#%% create a plot per district, only for the district having recorded impacts,  and for the related glofas stations for the district
+
+Affected_admin2=np.unique(flood_events['district'].values)  
+
 for districts in Affected_admin2: # for each district of Uganda
     print('############')
     print(districts)
-    df_event1=df_event[df_event['Area']==districts]
-    df_event1=df_event1['flood'] 
+    fe_district=flood_events[flood_events['district']==districts]
+    df_event1=fe_district['flood'] 
     df_y=pd.DataFrame()
     st= df_dg.loc[districts, 'Glofas_st':'Glofas_st4']
     st= st.dropna()
@@ -157,7 +200,64 @@ for districts in Affected_admin2: # for each district of Uganda
     except:
         continue
   
- #%% to do : GLOFAS Analysis / POD/ FAR
+ #%%  Joining together tables and extracting discharge data to create a prediction model table (df_model)
+    
+df_model = pd.merge(df_total, df_dg_long, how='left', on='station').dropna()
+df_model = pd.merge(df_model, impact_floods , how='left', on=['time', 'district'])
+df_model = pd.merge(df_model, df_station[['station','Q90', 'Q95','Q98']] , how='left', on='station')
+
+df_model['dis_min1'] = df_model['dis'].shift(1).fillna(0)
+df_model['dis_min2'] = df_model['dis'].shift(2).fillna(0)
+df_model['dis_min3'] = df_model['dis'].shift(3).fillna(0)
+df_model['flood'] = df_model['flood'].fillna(0)
+
+#create column of lag of Glofas (-1,-2 and -3 days)
+df_model['Q90_pred']=np.where((
+    (df_model['dis'] >= df_model['Q90']) |
+    (df_model['dis_min1'] >= df_model['Q90']) | 
+    (df_model['dis_min2'] >= df_model['Q90']) |
+    (df_model['dis_min3'] >= df_model['Q90'])
+    ), 1, 0)
+
+df_model['Q95_pred']=np.where((
+    (df_model['dis'] >= df_model['Q95']) |
+    (df_model['dis_min1'] >= df_model['Q95']) | 
+    (df_model['dis_min2'] >= df_model['Q95']) |
+    (df_model['dis_min3'] >= df_model['Q95'])
+    ), 1, 0)
+
+df_model['Q98_pred']=np.where((
+    (df_model['dis'] >= df_model['Q98']) |
+    (df_model['dis_min1'] >= df_model['Q98']) | 
+    (df_model['dis_min2'] >= df_model['Q98']) |
+    (df_model['dis_min3'] >= df_model['Q98'])
+    ), 1, 0)
+
+#df_model.query('Q98_pred == 1')    #Tool to do a query in the df_model
+
+#%% Calculating performance index of the prediction model and saving result in .csv
+performance_scores=pd.DataFrame(columns=['district','station','nb_event', 'pod','far','pofd','csi'])
+quantiles = ['Q90_pred', 'Q95_pred', 'Q98_pred']
+
+for quantile in quantiles:
+    perf= df_model.groupby(['district', 'station']).apply(lambda row: calc_performance_scores(row['flood'], row[quantile])).reset_index()
+    perf['quantile'] = quantile
+    performance_scores=performance_scores.append(perf)
+    
+# adding the number of flood impact data per district
+floods_per_district = impact_floods.groupby('district')['flood'].count()
+performance_scores = pd.merge(floods_per_district, performance_scores, how='left', on=['district'])
+performance_scores = performance_scores.rename(columns={ 'flood': 'nb_event'})
+performance_scores = performance_scores[['district','station','nb_event','quantile', 'pod','far','pofd','csi']]
+
+performance_scores.to_csv('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/output/uganda/Performance_scores/uga_glofas_performance_score.csv')
+
+
+
+
+
+
+
 
     
 
