@@ -19,6 +19,8 @@
       |    └── create_rain_data.R              # after downloading rainfall use this script to extract rainfall per catchment 
       |    └── download_rain_data.py           # download rainfall data
       |    └── glofas_research.R               # a script which will explore if GLOFAS flow data from a station capture a flood impact event 
+      |    └── glofas_download_data.py         # download glofas river discharge data (global)    
+      |    └── glofas_slice_country.py         # loag global glofas data, select one country and save it in a new file
       |    └── make_flood_plots.R              # this script plot impact data and GLOFAS flow data associate a potential glofas station ) this script then make a datamatrix by combining all the sation district information
       |    ├── shiny_uganda_data_explorer      # folder for an app which is used for rainfall data visualization          
       |    └── ...
