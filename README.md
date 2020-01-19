@@ -33,7 +33,7 @@
 To run catchment extractor script addtional data is needed - this can be found in the following link https://rodekruis.sharepoint.com/:f:/s/510-CRAVK-510/EhG4P2uRQRZKjZiJlo7YMYwBs5sqYxzcHmElbF4GtCGF6Q?e=g2mdMV
 
 ## GLOFAS data
-[Uganda river discharge, 2000-2019](https://rodekruis.sharepoint.com/sites/510-CRAVK-510/Gedeelde%2520%2520documenten/%5BCTRY%5D%2520Uganda/2-%2520IBF%2520FLOOD%2520UGANDA/FLOOD%2520INDICATORS%2520ANALYSIS/GLOFAS_ANALYSIS/uga_glofas_all.nc)
-
-Old files:
+* [Uganda river discharge, 2000-2019](https://rodekruis.sharepoint.com/sites/510-CRAVK-510/Gedeelde%20%20documenten/%5BCTRY%5D%20Uganda/2-%20IBF%20FLOOD%20UGANDA/FLOOD%20INDICATORS%20ANALYSIS/GLOFAS_ANALYSIS/uga_glofas_all.nc)
+* [Kenya river discharge, 2000-2019](https://rodekruis.sharepoint.com/sites/510-CRAVK-510/Gedeelde%20%20documenten/%5BCTRY%5D%20Kenya/FLOOD%20INDICATOR%20ANALYSIS/kenya_glofas_all.nc)
+* Old files:
 https://rodekruis.sharepoint.com/sites/510-CRAVK-510/Gedeelde%20%20documenten/FbF%20-%20Mali%20-%20RPII/Trigger%20methodology/glofas2.nc.tar
