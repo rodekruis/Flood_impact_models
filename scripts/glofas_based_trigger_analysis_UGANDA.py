@@ -110,7 +110,7 @@ for station in stations_list:
     df_y.to_csv(('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/glofas/GLOFAS_data_for_%s.csv' %station))
     
     # create a combined .cv file for all station station of glofas with filled data every day
-    #df_z=pd.DataFrame(columns=['station', 'time', 'dis']) 
+    df_z=pd.DataFrame(columns=['station', 'time', 'dis']) 
     flow=di[station]['dis'].median(dim='ensemble').sel(step=1).drop(['step']) # median of esemble variables
     flow_fill=flow.resample(time='1D').ffill()
     df_z['time']=flow_fill['time'].values         
@@ -152,7 +152,9 @@ df_station.to_csv('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/shapes/uga_
 #Open the flood impact data .csv file and create a dataframe
 flood_events=pd.read_csv("C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/impact_data.csv", encoding='latin-1')  
 flood_events['Date']= pd.to_datetime(flood_events['Date'], format='%m/%d/%Y')                     # transforming date from string to datetime                                                        # create a list of event dates
-flood_events = flood_events[['Area', 'flood']].reset_index().rename(columns={'Date': 'time', 'Area': 'district'})
+flood_events.index=flood_events['Date']
+flood_events = flood_events[['Area', 'flood']].rename(columns={'Area': 'district'})
+#flood_events = flood_events[['Area', 'flood']].reset_index().rename(columns={'Date': 'time', 'Area': 'district'})
 
 #  open the impacted_area and Glofas related stations per district files
 df_dg=pd.read_csv("C:/CODE_510/statistical_floodimpact_uganda-Ghitub/raw_data/uganda/AFFECTED_DIST_with_glofas_ABU.csv", encoding='latin-1')  
@@ -202,6 +204,11 @@ for districts in Affected_admin2: # for each district of Uganda
   
  #%%  Joining together tables and extracting discharge data to create a prediction model table (df_model)
     
+    
+
+impact_floods = flood_events.reset_index().rename(columns={'Date': 'time'})
+#impact_floods = flood_events[['Area', 'flood']].reset_index().rename(columns={'Date': 'time', 'Area': 'district'})    
+    
 df_model = pd.merge(df_total, df_dg_long, how='left', on='station').dropna()
 df_model = pd.merge(df_model, impact_floods , how='left', on=['time', 'district'])
 df_model = pd.merge(df_model, df_station[['station','Q90', 'Q95','Q98']] , how='left', on='station')
@@ -236,7 +243,7 @@ df_model['Q98_pred']=np.where((
 #df_model.query('Q98_pred == 1')    #Tool to do a query in the df_model
 
 #%% Calculating performance index of the prediction model and saving result in .csv
-performance_scores=pd.DataFrame(columns=['district','station','nb_event', 'pod','far','pofd','csi'])
+performance_scores=pd.DataFrame(columns=['district','station', 'pod','far','pofd','csi'])
 quantiles = ['Q90_pred', 'Q95_pred', 'Q98_pred']
 
 for quantile in quantiles:
@@ -250,7 +257,7 @@ performance_scores = pd.merge(floods_per_district, performance_scores, how='left
 performance_scores = performance_scores.rename(columns={ 'flood': 'nb_event'})
 performance_scores = performance_scores[['district','station','nb_event','quantile', 'pod','far','pofd','csi']]
 
-performance_scores.to_csv('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/output/uganda/Performance_scores/uga_glofas_performance_score.csv')
+performance_scores.to_csv('C:/CODE_510/statistical_floodimpact_uganda-Ghitub/output/uganda/Performance_scores/uga_glofas_performance_score.csv', index=False)
 
 
 
