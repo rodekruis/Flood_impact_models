@@ -76,15 +76,9 @@ catchment_extractor<-function(sample_admin,basin){
 #---------------------- Load admin boundary data -------------------------------  
 
 eth_admin3 <- st_read(dsn='C:/documents/ethiopia/admin3',layer='admin3')
-rivers <- st_read(dsn='C:/documents/General_data/Basins/hydrosheds/African_rivers',layer='af_riv_15s')
+# for visual add the river network in the plot 
+#rivers <- st_read(dsn='C:/documents/General_data/Basins/hydrosheds/African_rivers',layer='af_riv_15s')
 eth_admin3<-eth_admin3 %>%  dplyr::mutate(Pcode=NewPCODE) %>%  dplyr::select(Pcode,geometry)
-
-region2<-extent(eth_admin3)
-
-ethiopia_region = st_bbox(c(xmin =as.vector(region2@xmin), xmax = as.vector(region2@xmax),
-                            ymin = as.vector(region2@ymin), ymax =as.vector(region2@ymax)),
-                          crs = st_crs(eth_admin3)) %>% st_as_sfc()
-
 basin <- st_read(dsn='C:/documents/General_data/Basins/hydrosheds/African_basins',layer='hybas_lake_af_lev12_v1c')
 
 
