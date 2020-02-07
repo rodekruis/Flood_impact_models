@@ -1,0 +1,4 @@
+catchments/*
+all_basins_and_rivers/*
+!catchments/.gitkeep
+!all_basins_and_rivers/.gitkeep

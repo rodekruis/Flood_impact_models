@@ -14,3 +14,15 @@ country_settings <- list(
     "catchment_id_column" = "HYBAS_ID"
   ) 
 )
+
+catchment_extraction_settings <- list(
+  "basins_folder" = "shapes/all_basins_and_rivers",
+  "basins_layer" = "hybas_lake_af_lev12_v1c",
+  "river_folder" = "shapes/all_basins_and_rivers",
+  "river_layer" =  "af_riv_15s",
+  "admin_folder" = "shapes/ethiopia_admin",
+  "admin_layer" = "ETH_adm1_mapshaper",
+  "admin_identifier" = "REG_Pcode",
+  "output_folder" = "shapes/catchments/ethiopia_admin1",
+  "output_filename" = "ethiopia_admin1_catchments.shp"
+)
