@@ -75,7 +75,18 @@ for (i in 1:nrow(admin_shapes)) {
 result_polygons <- SpatialPolygons(lapply(result, function(x) slot(x, "polygons")[[1]]))
 admin_ids <- data.frame(admin_id = sapply(slot(result_polygons, "polygons"), function(x) slot(x, "ID")))
 spatial_df <- st_as_sf(SpatialPolygonsDataFrame(result_polygons, admin_ids))
-
+# here is a code to visualize adminboundary,extracted basin and river network (it helps to understand the code)
+                                          
+# library(tmap)
+#rivers_<- st_crop(rivers, st_bbox(admin_shapes))
+#tmap_mode(mode = "view")
+#tm_shape(admin_shapes[4,]) + tm_polygons(col =NA,colorNA=NULL,border.col = "black",lwd = 0.5,lyt='dotted')+
+#  tm_shape(spatial_df [4,]) +
+#  tm_polygons(col =NA,colorNA=NULL,alpha=0.3,border.col = "red",lwd = 0.1,lyt='dotted') +
+# tm_shape(rivers_) +
+# tm_lines(col ='blue',scale=2,lwd = 0.1)
+                                          
+                                          
 # Save to shapefile (and create output folder if it does not exist)
 dir.create(settings$output_folder, recursive=TRUE, showWarnings = FALSE)
 st_write(spatial_df, paste0(settings$output_folder, "/", settings$output_filename), update=TRUE)
