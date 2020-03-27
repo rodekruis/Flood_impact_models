@@ -1,0 +1,12 @@
+name: ZMB_GLOFAS
+title: ZMB_GLOFAS
+username:
+account: kv301091
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 753225
+bundleId: 1908915
+url: https://kv301091.shinyapps.io/ZMB_GLOFAS/
+when: 1551444606.60621
+asMultiple: FALSE
+asStatic: FALSE
