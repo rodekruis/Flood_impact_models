@@ -12,7 +12,7 @@ library(ncdf4)
 library(httr)
 library(sf)
 #---------------------- Load inmpact data -------------------------------
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 
 crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
@@ -39,7 +39,7 @@ catchment_extraction_settings <- list(
 # Load in rainfall dataset 
 #impact_data <- read.delim("data/Flood_impact.csv",sep=';',fileEncoding="UTF-8-BOM")
 
-impact_data <- read.delim("data/Eth_impact_data2.csv",sep=';',fileEncoding="UTF-8-BOM")
+impact_data <- read.delim("raw_data/Ethiopia/Eth_impact_data2.csv",sep=';',fileEncoding="UTF-8-BOM")
 
 
 

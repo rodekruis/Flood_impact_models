@@ -33,12 +33,12 @@ for (raster_folder in raster_folders) {
 }
 
 # Combining files
-# all_swis <- bind_rows(swi_dfs)
-# write.csv(all_swis, paste0("raw_data/Ethiopia/swi/ethiopia_admin3_swi", depth, ".csv"), row.names=F)
-# 
-# swi005 <- read.csv("raw_data/Ethiopia/swi/ethiopia_admin3_swi005.csv") %>% rename(swi005 = swi)
-# swi010 <- read.csv("raw_data/Ethiopia/swi/ethiopia_admin3_swi010.csv") %>% rename(swi010 = swi)
-# swi015 <- read.csv("raw_data/Ethiopia/swi/ethiopia_admin3_swi015.csv") %>% rename(swi015 = swi)
-# 
-# swi_all <- swi005 %>% left_join(swi010) %>% left_join(swi015)
+all_swis <- bind_rows(swi_dfs)
+write.csv(all_swis, paste0("raw_data/Ethiopia/swi/ethiopia_admin3_swi", depth, ".csv"), row.names=F)
+
+swi005 <- read.csv("raw_data/Ethiopia/swi/ethiopia_admin3_swi005.csv", stringsAsFactors = F, colClasses = c("character", "character", "numeric")) %>% rename(swi005 = swi)
+swi010 <- read.csv("raw_data/Ethiopia/swi/ethiopia_admin3_swi010.csv", stringsAsFactors = F, colClasses = c("character", "character", "numeric")) %>% rename(swi010 = swi)
+swi015 <- read.csv("raw_data/Ethiopia/swi/ethiopia_admin3_swi015.csv", stringsAsFactors = F, colClasses = c("character", "character", "numeric")) %>% rename(swi015 = swi)
+
+swi_all <- swi005 %>% left_join(swi010) %>% left_join(swi015)
 write.csv(swi_all, "raw_data/Ethiopia/swi/ethiopia_admin3_swi_all.csv", row.names=F)
