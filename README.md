@@ -8,9 +8,9 @@ The scripts avilable in this repo grouped into the fowllowing catgories. Geo spa
       A script which link impact (which was analyzed in understanding the risk part) with Hazard. Hydro-Met data will be used as a             proxy for discribing hazard 
 ## 3. Trigger model development
       Here we build a trigger model based on data from Impact-hazard catalogue    
-## 4. Visualization
+## 4. Visualization of trigger model
      easy visualization of the IBF model results for descion makers ds for 
-        
+## 5. Intervention maps (combining vulnerability index with exposure and hazard maps )
 Geo spatial data needed for running the scripts are stored in 510geonode server. For running the scripts check list of variables in Geo_setting.R
     
     
