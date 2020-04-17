@@ -1,3 +1,16 @@
+### Introduction
+This repository contains  scripts for the different steps involved in Impact based forecasting(IBF) model development 
+The scripts avilable in this repo grouped into the fowllowing catgories 
+    #1. Understanding the risk 
+        A scipt which is used to asses flood/drought risk based on historical data
+    #2. Impact hazard catalogue
+        A script which link impact (which was analyzed in understanding the risk part) with Hazard. Hydro-Met data will be used as a             proxy for discribing hazard 
+    #3. Trigger model development
+        here we build a trigger model based on data from Impact-hazard catalogue    
+    #4. Visualization
+        easy visualization of the IBF model results for descion makers ds for 
+    
+    
 ### Discription of directory layout
 
     .
