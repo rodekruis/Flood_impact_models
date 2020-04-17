@@ -12,6 +12,8 @@ country_settings <- list(
   "general_geo" = list( "glofas_st"="geonode:glofas_stations_africa",  
                     "basins_africa"="geonode:hybas_af_lev12_v1", 
                     "rivers"="geonode:af_riv_15s"),
-   "kenya" = list(  )
+   "kenya" = list( "admin2"="geonode:ken_adm2_mapshaper",
+                    "admin1"="geonode:ken_adm1_mapshaper",
+                    "admin3"="geonode:ken_adm3_mapshaper"  )
 )
 
