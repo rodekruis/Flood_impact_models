@@ -1,6 +1,6 @@
 # Introduction
 This repository contains  scripts for the different steps involved in Impact based forecasting(IBF) model development 
-The scripts avilable in this repo grouped into the fowllowing catgories.
+The scripts avilable in this repo grouped into the fowllowing catgories. Geo spatial data needed for running the scripts are stored in 510geonode server. For running the scripts please check  Geo_setting.R for name of variables for retriving data from 510geonode server.
 
 ## 1. Understanding the risk (understanding_the_risk.R)
      A scipt which is used to asses flood/drought risk based on historical data.
