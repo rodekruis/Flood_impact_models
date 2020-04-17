@@ -11,14 +11,15 @@ library(ncdf4)
 library(httr)
 library(zoo)
 #---------------------- setting -------------------------------
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+Country='Ethiopia'
+#setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 source("Geo_settings.R")
 settings <- country_settings
 url<- parse_url(url_geonode)
 # raead boundary shape files and stations 
-for (elm in  names(settings$Ethiopia)){
+for (elm in  names(eval(parse(text=paste("settings$",Country,sep=""))))){
   url$query <- list(service = "WFS",version = "2.0.0",request = "GetFeature",
-                    typename = eval(parse(text=paste("settings$Ethiopia","$",elm,sep=""))),
+                    typename = eval(parse(text=paste("settings$",Country,"$",elm,sep=""))),
                     outputFormat = "application/json")
   request <- build_url(url)
   data_read <- st_read(request)
