@@ -38,7 +38,7 @@ for (elm in  names(settings$general_geo)){
 } # download Geo Data 
 
 admin3 <- admin3 %>%filter(st_is_valid(geometry))
-impact_admin3 <- impact_admin3 %>%filter(st_is_valid(geometry))
+impact_data <- impact_data %>%filter(st_is_valid(geometry))
 admin_zone <- admin2 %>%filter(st_is_valid(geometry))
 
 admin3 <- st_transform(admin3, st_crs(crs1))
@@ -50,7 +50,8 @@ eth_glofas_st<-st_intersection(glofas_st,impact_admin3) %>% filter(id !='Na')  %
 
 #---------------------- aggregate IMpact data for admin 2 admin 1 -------------------------------
 # to do define impact columns in setting file in Ethiopian Case Crop.Damages, Lost.Cattle,Affected 
-impact_data1_w_ts <- impact_admin3 %>% mutate(Affected=as.numeric(Affectd),
+# change the variables for Kenya based on the column names in impct_data
+impact_data1_w_ts <- impact_data %>% mutate(Affected=as.numeric(Affectd),
                                               Lost.Cattle=as.numeric(Lst_Ctt),
                                               Crop.Damages=as.numeric(Crp_Dmg)) 
 
@@ -155,7 +156,7 @@ tm_shape(impact_data1_w) + tm_polygons(col = "Crop.Damages",name='W_Name',
                                        labels=c('< 5','5 - 50','50 - 200','200 - 1k','2k - 4k',' >4k'),
                                        title="Area of Damaged Crops",
                                        border.col = "black",lwd = 0.5,lyt='dotted')+
-  tm_shape(eth_admin3) + tm_borders(lwd = .5,col='#bdbdbd') +
+  tm_shape(admin3) + tm_borders(lwd = .5,col='#bdbdbd') +
   tm_layout(frame=F,scale = 1.5, legend.position = c(.78,.82), 
             legend.outside.size = 0.1,
             legend.title.size = 2.0,
@@ -172,7 +173,7 @@ tm_shape(impact_data1_w) + tm_polygons(col = "Lost.Cattle",name='W_Name',
                                        labels=c('< 5','5 - 500','500 - 2k','2k - 10k','10k - 20k',' >40k'),
                                        title="Total Lost Cattle",
                                        border.col = "black",lwd = 0.5,lyt='dotted')+
-  tm_shape(eth_admin3) + tm_borders(lwd = .5,col='#bdbdbd') +
+  tm_shape(admin3) + tm_borders(lwd = .5,col='#bdbdbd') +
   tm_layout(frame=F,scale = 1.5, legend.position = c(.78,.82), 
             legend.outside.size = 0.1,
             legend.title.size = 2.0,
