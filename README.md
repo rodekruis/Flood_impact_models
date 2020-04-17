@@ -3,7 +3,7 @@ This repository contains  scripts for the different steps involved in Impact bas
 The scripts avilable in this repo grouped into the fowllowing catgories. Geo spatial data needed for running the scripts are stored in 510geonode server. For running the scripts please check  Geo_setting.R for name of variables for retriving data from 510geonode server.
 
 ## 1. Understanding the risk (understanding_the_risk.R)
-     A scipt which is used to asses flood/drought risk based on historical data.
+     Impacts from natural disasters in the historical period will be analyised to understand the existing risk, both on economies and people's lives. we developed a scipt which is used to asses flood/drought risk based on historical data.
 ## 2. Impact hazard catalogue
       A script which link impact (which was analyzed in understanding the risk part) with Hazard. Hydro-Met data will be used as a             proxy for discribing hazard 
 ## 3. Trigger model development
