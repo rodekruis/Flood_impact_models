@@ -207,7 +207,7 @@ tm_shape(impact_data_County) + tm_polygons(col = "HH_impact", name='County',
                                        labels=c('< 5','5 - 100','100 - 500','500 - 2k','2k - 5k','5k - 10k'),
                                        title="No of Affected People",
                                        border.col = "black",lwd = 0.5,lyt='dotted')+
-  #tm_shape(NMA_stations_) + tm_symbols(size=0.5,border.alpha = 0.25,col='#045a8d') +
+  tm_shape(glofas_st) + tm_symbols(size=0.5,border.alpha = 0.25,col='#045a8d') +
   tm_shape(kenya_glofas_st) + tm_symbols(size=0.5,border.alpha = 0.5,col='#74a9cf') +
   #tm_shape(Eth_affected_area_stations_ZONE) + tm_symbols(size=0.9,border.alpha = 0.25,col='#045a8d') +
   #tm_shape(NMA_stations) + tm_text("Gh_id",size=.5)+ 
