@@ -3,13 +3,18 @@ This repository contains  scripts for the different steps involved in Impact bas
 The scripts avilable in this repo grouped into the fowllowing catgories. Geo spatial data needed for running the scripts are stored in 510geonode server. For running the scripts please check  Geo_setting.R for name of variables for retriving data from 510geonode server.
 
 ## 1. [Understanding the risk](https://github.com/rodekruis/Flood_impact_models/blob/master/scripts/understanding_the_risk.R)
-     Impacts from natural disasters in the historical period will be analyised to understand the existing risk, both on economies and people's lives. we developed a scipt which is used to asses flood/drought risk based on historical data.
+Impacts from natural disasters in the historical period will be analyised to understand the existing risk, both on economies and people's lives. we developed a scipt which is used to asses flood/drought risk based on historical data.
+The outcome of this analysis is a risk map, which is based on historical impact data 
+![Example of risk analysis for Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_people.jpeg)
+
 ## 2. [Impact hazard catalogue](https://github.com/rodekruis/Flood_impact_models/blob/master/scripts/impact_hazard_catalog.R)
-      A script which link impact (which was analyzed in understanding the risk part) with Hazard. Hydro-Met data will be used as a             proxy for discribing hazard 
+A script which link impact (which was analyzed in understanding the risk part) with Hazard. Hydro-Met data will be used as a             proxy for discribing hazard.
+The outcome of this analysis is a hazard-impact catalog, which is based on historical impact data and hazard variable  
+![Example of impact-hazard analysis for a single event(hazard is based on glofas data](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_people.jpeg)
 ## 3. Trigger model development
-      Here we build a trigger model based on data from Impact-hazard catalogue    
+Here we build a trigger model based on data from Impact-hazard catalogue    
 ## 4. Visualization of trigger model
-     easy visualization of the IBF model results for descion makers ds for 
+easy visualization of the IBF model results for descion makers ds for 
 ## 5. Intervention maps (combining vulnerability index with exposure and hazard maps )
 Geo spatial data needed for running the scripts are stored in 510geonode server. For running the scripts check list of variables in Geo_setting.R
     
