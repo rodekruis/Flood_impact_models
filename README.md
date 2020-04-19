@@ -10,7 +10,7 @@ The outcome of this analysis is a risk map, which is based on historical impact 
 ## 2. [Impact hazard catalogue](https://github.com/rodekruis/Flood_impact_models/blob/master/scripts/impact_hazard_catalog.R)
 A script which link impact (which was analyzed in understanding the risk part) with Hazard. Hydro-Met data will be used as a             proxy for discribing hazard.
 The outcome of this analysis is a hazard-impact catalog, which is based on historical impact data and hazard variable  
-![Example of impact-hazard analysis for a single event(hazard is based on glofas data](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_people.jpeg)
+![Example of impact-hazard analysis for a single event(hazard is based on glofas data](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact.PNG)
 ## 3. Trigger model development
 Here we build a trigger model based on data from Impact-hazard catalogue    
 ## 4. Visualization of trigger model
