@@ -13,8 +13,7 @@ country_settings <- list(
                     "basins_africa"="geonode:hybas_af_lev12_v1", 
                     "rivers"="geonode:af_riv_15s"), 
    "kenya" = list( "impact_data"="geonode:geolocation_of_impact",
-		    "admin2"="geonode:ken_adm2_mapshaper",
-                    "admin1"="geonode:ken_adm1_mapshaper",
-                    "admin3"="geonode:ken_adm3_mapshaper"  )
+		  "admin2"="geonode:ken_adm2_iebc",
+		  "admin1"="geonode:ken_adm1_iebc")
 )
 
