@@ -10,17 +10,20 @@ library(sf)
 library(ncdf4)
 library(httr)
 library(zoo)
-
+library(grid)
+library(ggpubr)
 #---------------------- setting -------------------------------
 Country="kenya"
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
 source("Geo_settings.R")
+setwd('../')
 settings <- country_settings
 url<- parse_url(url_geonode)
 
 #----------------------------function defination -------------
 
-make_zoomed_in_plots <- function(impact,hazard,t_delta=30,pdf_name){
+make_zoomed_in_plots <- function(impact_county,impact,hazard,t_delta=30,pdf_name){
   pdf(pdf_name, width=11, height=8.5)
   
   impact<- impact %>% mutate(Date_=as.Date(Date_st,format="%Y-%m-%d"))
@@ -64,14 +67,18 @@ make_zoomed_in_plots <- function(impact,hazard,t_delta=30,pdf_name){
     }
     
     # Make plot facetwrapped for each variable
-    p <- hazard_sub %>% ggplot(aes(x = Date,y=dis)) + geom_line(aes(colour = Lead_time)) +
+   # options(repr.plot.width = 6, repr.plot.height = 2)
+    p1 <- hazard_sub %>% ggplot(aes(x = Date,y=dis)) + geom_line(aes(colour = Lead_time)) +
       geom_vline(xintercept = flood_date, linetype="dotted",  color = "red", size=1.5) +
       #geom_text(x=flood_date, y=.75*max(hazard_sub$dis), label=paste()"Scatter plot")
       #geom_point(aes(y = value * flood), color = "red") + facet_wrap(~Lead_time) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1),
             plot.title = element_text(hjust = 0.5, size = 10)) +
-      ggtitle(description)
+      ggtitle(description) +theme(legend.position = c(0.06, 0.75))
     
+    p<-ggarrange(p1,impact_county + rremove("x.text"),widths = c(2, 0.6),
+              labels = c("", "Location"),
+              ncol = 2, nrow = 1)
     print(p)
   }
   
@@ -109,7 +116,7 @@ admin2 <- admin2 %>%filter(st_is_valid(geometry))
 #admin3 <- admin3 %>%filter(st_is_valid(geometry))
 #admin3 <- st_transform(admin3, st_crs(crs1))
 impact_data1_1 <- impact_data %>%
-  mutate(date = as.Date(Date, format="%d/%m/%Y"),flood = 1) #%>% dplyr::select(-Region)
+  mutate(date = as.Date(Date_st, format="%Y/%m/%d"),flood = 1) #%>% dplyr::select(-Region)
 
 #---------------------- aggregate IMpact data for admin 2 admin 1 -------------------------------
 # to do define impact columns in setting file in Ethiopian Case Crop.Damages, Lost.Cattle,Affected 
@@ -231,6 +238,7 @@ make_glofas_district_matrix <- function(glofas_data,glofas_stations_in_affected_
 
 impact_data_df<- impact_data_ts #%>% st_set_geometry(NULL)
 
+
 for (zones in unique(impact_data_df$County))
   {
   Hazard_glofas <- glofas_district_matrix %>% filter(County ==!!zones)# %>%   pull()
@@ -238,13 +246,22 @@ for (zones in unique(impact_data_df$County))
   for (st  in unique(Hazard_glofas$station)){
     print(st)
     print(zones)
-    
-    plot_data <- Hazard_glofas %>%filter(station == !!st) %>% select(-year) %>%
+
+    plot_data <- Hazard_glofas %>%
+      filter(station == !!st) %>%
+      select(-year) %>% 
       rename(t0=dis,t_3days=dis_3day, t_7days=dis_7day) %>% 
       gather('Lead_time','dis',-Date,-station,-County)
-    print(nrow(plot_data))
+
+    impact_county <- ggplot() +   geom_sf(data = admin1) + 
+      geom_sf(data = admin2 %>% filter(ADM1_EN ==!!zones),col ='red',fill = 'red') +
+      geom_sf(colour = "blue", size = 3,data=glofas_st %>% filter(glofas_st$id %in% st)) +theme(  axis.text.x = element_blank(),
+                                                                                                  axis.text.y = element_blank(),
+                                                                                                  axis.ticks = element_blank())
+      
+    
     #p<- ggplot(plot_data, aes(Date,dis)) + geom_line(aes(colour = Lead_time))
-    make_zoomed_in_plots(impact=impact,hazard=plot_data,t_delta=100,pdf_name=paste0(getwd(),"/output/",zones,st,"zoomed_in_per_flood.pdf"))
+    make_zoomed_in_plots(impact_county=impact_county,impact=impact,hazard=plot_data,t_delta=100,pdf_name=paste0(getwd(),"/output/Kenya/",zones,st,"zoomed_in_per_flood.pdf"))
     
     #print(p)
    # p <- plot_data %>%  ggplot(aes(x = date, y = dis)) + geom_line() + geom_label(aes(y=dis, label=label)) +
@@ -256,7 +273,6 @@ for (zones in unique(impact_data_df$County))
 
 
 
- 
 
 
 

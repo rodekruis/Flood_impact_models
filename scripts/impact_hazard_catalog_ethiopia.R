@@ -10,17 +10,19 @@ library(sf)
 library(ncdf4)
 library(httr)
 library(zoo)
-
+library(ggpubr)
 #---------------------- setting -------------------------------
 Country="Ethiopia"
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
 source("Geo_settings.R")
+setwd('../')
 settings <- country_settings
 url<- parse_url(url_geonode)
 
 #----------------------------function defination -------------
 
-make_zoomed_in_plots <- function(impact_data,hazard,t_delta=30,pdf_name){
+make_zoomed_in_plots <- function(impact_zone,impact_data,hazard,t_delta=30,pdf_name){
   pdf(pdf_name, width=11, height=8.5)
   
   impact_data<- impact_data %>% mutate(Date_=as.Date(Date,format="%d/%m/%Y"))
@@ -45,6 +47,7 @@ make_zoomed_in_plots <- function(impact_data,hazard,t_delta=30,pdf_name){
     # Filter rainfall data 
     date_from <- flood_date - t_delta
     date_to <- flood_date + t_delta
+    
     hazard_sub <- hazard %>%filter(Date > date_from,Date < date_to) #%>%mutate(flood = ifelse(date == flood_date, TRUE, NA))
     
     # Filter if less than 30 rows because event is more in the future than rainfall data
@@ -64,15 +67,23 @@ make_zoomed_in_plots <- function(impact_data,hazard,t_delta=30,pdf_name){
     }
     
     # Make plot facetwrapped for each variable
-    p <- hazard_sub %>% ggplot(aes(x = Date,y=dis)) + geom_line(aes(colour = Lead_time)) +
+    p1 <- hazard_sub %>% ggplot(aes(x = Date,y=dis)) + geom_line(aes(colour = Lead_time)) +
       geom_vline(xintercept = flood_date, linetype="dotted",  color = "red", size=1.5) +
       #geom_text(x=flood_date, y=.75*max(hazard_sub$dis), label=paste()"Scatter plot")
       #geom_point(aes(y = value * flood), color = "red") + facet_wrap(~Lead_time) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1),
             plot.title = element_text(hjust = 0.5, size = 10)) +
-      ggtitle(description)
+      ggtitle(description) +theme(legend.position = c(0.06, 0.75))
     
+    p<-ggarrange(p1,impact_zone + rremove("x.text"),widths = c(2, 0.6),
+                 labels = c("", "Location"),
+                 ncol = 2, nrow = 1)
     print(p)
+    
+    
+    
+    
+    
   }
   
   dev.off() 
@@ -114,7 +125,7 @@ impact_data1_1 <- impact_data %>%
 impact_data1_w_ts <- impact_data1_1 %>% mutate(Affected=as.numeric(Affectd),
                                               Lost.Cattle=as.numeric(Lst_Ctt),
                                               Crop.Damages=as.numeric(Crp_Dmg)) %>% 
-  select(Region,Zone,Wereda,Pcode,Date,Affectd,Lost.Cattle,Crop.Damages)
+  select(Region,Zone,Wereda,Pcode,Date,Affected,Lost.Cattle,Crop.Damages)
 
 impact_data1_Z<-impact_data1_w_ts %>% group_by(Zone) %>%  summarise(Affected = sum(Affected,na.rm=TRUE),
                                                                     geometry=st_union(geometry),
@@ -225,8 +236,6 @@ fill_glofas_data <- function(glofas_data){
 
 fill_glofas_data_<-fill_glofas_data(glofas_data)
 
-glofas_stations_in_affected_areas
-
 
 
 
@@ -264,7 +273,16 @@ for (zones in unique(impact_data_df$Zone))
       rename(t0=dis,t_3days=dis_3day, t_7days=dis_7day) %>% 
       gather('Lead_time','dis',-Date,-station,-Zone)
     #p<- ggplot(plot_data, aes(Date,dis)) + geom_line(aes(colour = Lead_time))
-    make_zoomed_in_plots(impact_data=impact,hazard=plot_data,t_delta=100,pdf_name=paste0(getwd(),"/output/",zones,st,"zoomed_in_per_flood.pdf"))
+    
+    impact_zone <- ggplot() +   geom_sf(data = admin1) + 
+      geom_sf(data = admin2 %>% filter(Z_NAME ==!!zones),col ='red',fill = 'red') +
+      geom_sf(colour = "blue", size = 3,data=glofas_st %>% filter(glofas_st$id %in% st)) +theme(  axis.text.x = element_blank(),
+                                                                                                  axis.text.y = element_blank(),
+                                                                                                  axis.ticks = element_blank())
+    
+    
+    #p<- ggplot(plot_data, aes(Date,dis)) + geom_line(aes(colour = Lead_time))
+    make_zoomed_in_plots(impact_zone=impact_zone,impact=impact,hazard=plot_data,t_delta=100,pdf_name=paste0(getwd(),"/output/Ethiopia/",zones,st,"zoomed_in_per_flood.pdf"))
     
     #print(p)
    # p <- plot_data %>%  ggplot(aes(x = date, y = dis)) + geom_line() + geom_label(aes(y=dis, label=label)) +
