@@ -5,7 +5,11 @@ The scripts avilable in this repo grouped into the fowllowing catgories. Geo spa
 ## 1. [Understanding the risk](https://github.com/rodekruis/Flood_impact_models/blob/master/scripts/understanding_the_risk.R)
 Impacts from natural disasters in the historical period will be analyised to understand the existing risk, both on economies and people's lives. we developed a scipt which is used to asses flood/drought risk based on historical data.
 
-The outcome of this analysis is a risk map, which is based on historical impact data 
+Input
+-- Admin boundaries and impact data are uploaded on 510 geonode server, 
+-- Geo_setting.R file is updated with layer names for these datasets
+Output
+-- The outcome of this analysis is a risk map, which is based on historical impact data 
 ![Example of risk analysis for Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_people.jpeg)
 
 ## 2. [Impact hazard catalogue](https://github.com/rodekruis/Flood_impact_models/blob/master/scripts/impact_hazard_catalog.R)
