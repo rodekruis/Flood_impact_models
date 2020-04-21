@@ -11,8 +11,10 @@ Input
 
 Output
 * The outcome of this analysis is a risk map, which is based on historical impact data 
-![Example of risk analysis for Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_annimation.gif)
-![Example of risk analysis for Kenya](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Kenya/kenya_risk.PNG)
+* Ethiopia Risk Analysis Example
+* ![Example of risk analysis for Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_annimation.gif)
+* Kenya Risk Analysis Example
+* ![Example of risk analysis for Kenya](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Kenya/kenya_risk.PNG)
 
 ## 2. [Impact hazard catalogue](https://github.com/rodekruis/Flood_impact_models/blob/master/scripts/impact_hazard_catalog.R)
 A script which link impact (which was analyzed in understanding the risk part) with Hazard. Hydro-Met data will be used as a             proxy for discribing hazard.
@@ -24,9 +26,9 @@ Input
 
 Output
 * The outcome of this analysis is a hazard-impact catalog, which is based on historical impact data and hazard variable  
-Ethiopia risk analysis Example 
+    Example of impact-hazard analysis for a single event(hazard is based on glofas data) Ethiopia
 ![Example of impact-hazard analysis for a single event(hazard is based on glofas data) Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact.PNG)
-Kenya Risk Analysis Example
+    Example of impact-hazard analysis for a single event(hazard is based on glofas data) Kenya
 ![Example of impact-hazard analysis for a single event(hazard is based on glofas data) Kenya](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact_kenya.PNG)
 ## 3. Trigger model development
 Here we build a trigger model based on data from Impact-hazard catalogue    
