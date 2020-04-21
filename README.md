@@ -23,7 +23,8 @@ Input
 
 Output
 * The outcome of this analysis is a hazard-impact catalog, which is based on historical impact data and hazard variable  
-![Example of impact-hazard analysis for a single event(hazard is based on glofas data](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact.PNG)
+![Example of impact-hazard analysis for a single event(hazard is based on glofas data) Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact.PNG)
+![Example of impact-hazard analysis for a single event(hazard is based on glofas data) Kenya](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact_kenya.PNG)
 ## 3. Trigger model development
 Here we build a trigger model based on data from Impact-hazard catalogue    
 ## 4. Visualization of trigger model
