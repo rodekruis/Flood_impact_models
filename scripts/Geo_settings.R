@@ -2,7 +2,10 @@ crs1 <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 url_geonode <- "https://geonode.510.global/geoserver/geonode/ows"
 
 country_settings <- list(
-  "uganda" = list( ),
+  "uganda" = list("admin1"="geonode:uga_admin1",
+		  "admin2"="geonode:uga_admin2",
+		  "admin3"="geonode:uga_admin3",
+		  "impact_data"="geonode:uga_admin3" ),
   "Ethiopia" = list("NMA_stations"="geonode:nam_stations",
                     "eth_hydro_st"="geonode:eth_hydro_st",
 		    "impact_data"="geonode:eth_impact_data2",
