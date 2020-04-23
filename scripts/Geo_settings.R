@@ -5,7 +5,7 @@ country_settings <- list(
   "uganda" = list("admin1"="geonode:uga_admin1",
 		  "admin2"="geonode:uga_admin2",
 		  "admin3"="geonode:uga_admin3",
-		  "impact_data"="geonode:uga_admin3" ),
+		  "impact_data"="geonode:uga_impact_data"),
   "Ethiopia" = list("NMA_stations"="geonode:nam_stations",
                     "eth_hydro_st"="geonode:eth_hydro_st",
 		    "impact_data"="geonode:eth_impact_data2",
