@@ -25,11 +25,18 @@ Input
 * River discharge/Rainfall data
 
 Output
-* The outcome of this analysis is a hazard-impact catalog, which is based on historical impact data and hazard variable  
-    Example of impact-hazard analysis for a single event(hazard is based on glofas data) Ethiopia
+* plots for each events showing Impact and Hazard 
+* The outcome of the analysis is a hazard-impact catalog, which is based on historical impact data and GLOFAS hindcast
+
+### Hazard river discharge based on GLOFAS
+Example of impact-hazard analysis for a single event(hazard is based on glofas data) Ethiopia
 ![Example of impact-hazard analysis for a single event(hazard is based on glofas data) Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact.PNG)
-    Example of impact-hazard analysis for a single event(hazard is based on glofas data) Kenya
+Example of impact-hazard analysis for a single event(hazard is based on glofas data) Kenya
 ![Example of impact-hazard analysis for a single event(hazard is based on glofas data) Kenya](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact_kenya.PNG)
+### Hazard rainfall based on NAM hstorical data
+Example of impact-hazard analysis for a single event(hazard is based on NAM rainfall data) Ethiopia
+![Example of impact-hazard analysis for a single event(hazard is based on NAM RAINFALL Data) Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact_ethiopia_rainfall.PNG)
+
 ## 3. Trigger model development
 Here we build a trigger model based on data from Impact-hazard catalogue    
 ## 4. Visualization of trigger model
