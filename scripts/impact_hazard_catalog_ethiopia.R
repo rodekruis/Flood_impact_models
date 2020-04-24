@@ -136,6 +136,8 @@ impact_data1_Z%>%st_set_geometry(impact_data1_Z$geometry)
 impact_data1_Z <- impact_data1_Z %>%filter(st_is_valid(geometry))
 impact_data1_Z <- st_transform(impact_data1_Z, st_crs(basins_africa))
 
+
+
 impact_data1_w<-impact_data1_w_ts %>% group_by(Wereda) %>%  summarise(Affected = sum(Affected,na.rm=TRUE),
                                                                       Crop.Damages = sum(Crop.Damages,na.rm=TRUE),
                                                                       Lost.Cattle = sum(Lost.Cattle,na.rm=TRUE)) %>%ungroup()
@@ -168,7 +170,7 @@ eth_glofas_st<-glofas_st %>% filter(CountryNam =='Ethiopia')%>% mutate(station=i
 glofas_stations_in_affected_areas<-st_intersection(eth_glofas_st,impact_data) %>% 
   select(station,Zone) %>% distinct(station,Zone,.keep_all = TRUE)%>%    st_set_geometry(NULL)
 
-
+glofas_stations_in_affected_areas <- read.csv(paste0(getwd(),'/input/kenya_affected_area_stations.csv'),sep=";")
 #---------------------- vistualize stations and risk areas -------------------------------
 
 tmap_mode(mode = "view")
@@ -274,7 +276,7 @@ for (zones in unique(impact_data_df$Zone))
       gather('Lead_time','dis',-Date,-station,-Zone)
     #p<- ggplot(plot_data, aes(Date,dis)) + geom_line(aes(colour = Lead_time))
     
-    impact_zone <- ggplot() +   geom_sf(data = admin1) + 
+    impact_zone <- ggplot() +   geom_sf(data = admin2) + 
       geom_sf(data = admin2 %>% filter(Z_NAME ==!!zones),col ='red',fill = 'red') +
       geom_sf(colour = "blue", size = 3,data=glofas_st %>% filter(glofas_st$id %in% st)) +theme(  axis.text.x = element_blank(),
                                                                                                   axis.text.y = element_blank(),
