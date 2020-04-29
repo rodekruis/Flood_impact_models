@@ -15,6 +15,7 @@ library(zoo)
 library(ggpubr)
 library(purrr)
 library(nngeo)
+library(readxl)
 #---------------------- setting -------------------------------
 Country="Ethiopia"
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -70,7 +71,7 @@ make_zoomed_in_plots <- function(impact_zone,impact_data,hazard,t_delta=30,pdf_n
     }
        
     # Make plot facetwrapped for each variable
-   p1 <-  hazard_sub %>% ggplot(aes(x = Date,y=Rainfall))  + geom_line() +
+   p1 <-  hazard_sub %>% ggplot(aes(x = Date,y=Rainfall))  + geom_line(aes(colour = cum_days))+
       geom_vline(xintercept = flood_date, linetype="dotted",  color = "red", size=1.5) +
       #geom_text(x=flood_date, y=.75*max(hazard_sub$Rainfall), label=paste()"Scatter plot")
       #geom_point(aes(y = value * flood), color = "red") + facet_wrap(~Lead_time) +
@@ -118,10 +119,15 @@ impact_data1_w<-impact_data1_w_ts %>% group_by(Wereda) %>%  summarise(Affected =
                                                                       Crop.Damages = sum(Crop.Damages,na.rm=TRUE),
                                                                       Lost.Cattle = sum(Lost.Cattle,na.rm=TRUE)) %>%ungroup()
 
+
+
+
 # Read rainfall data 
 drr <- read_excel("C:/Users/ATeklesadik/OneDrive - Rode Kruis/Documents/documents/Flood_impact_models/input/rainfall/drr.xls",
                   range = "A1:AO10001")%>% rename(Element="Elment",Gh_id = `Gh id`) %>% select(-`Eg gh id`)
 drr2 <- read_excel("C:/Users/ATeklesadik/OneDrive - Rode Kruis/Documents/documents/Flood_impact_models/input/rainfall/drr2.xls",
+                   range = "A1:AL7551")%>% mutate(Gh_id='NA',Time='09:00')
+drr3 <- read_excel("C:/Users/ATeklesadik/OneDrive - Rode Kruis/Documents/documents/Flood_impact_models/input/rainfall/drr3.xlsx",
                    range = "A1:AL7551")%>% mutate(Gh_id='NA',Time='09:00')
 
 # clean data 
@@ -145,7 +151,7 @@ admin_centroid_pts <- st_as_sf(admin_centroid_pts, coords = c("cent_lon","cent_l
 
 
 # find the first nearest neighbor rainfall station station for each centroid, 
-NAM_stations_in_affected_weredas<-st_join(admin_centroid_pts, rainfall_stations_sf, st_nn, k = 2)%>% st_set_geometry(NULL)%>% select(Zone,Name,Gh_id)
+NAM_stations_in_affected_weredas<-st_join(admin_centroid_pts, rainfall_stations_sf, st_nn, k = 1)%>% st_set_geometry(NULL)%>% select(Zone,Name,Gh_id)
 
 NAM_stations_in_affected_zones<-NAM_stations_in_affected_weredas  %>%
   distinct(Zone,Name,.keep_all = TRUE)
@@ -163,7 +169,40 @@ make_rainfall_district_matrix <- function(rainfall_df,NAM_stations_in_affected_z
 
 rainfall_district_matrix<- make_rainfall_district_matrix(rainfall_df,NAM_stations_in_affected_zones)
 
+
+
+
+
+
+
+
+
 impact_data_df<- impact_data1_w_ts %>% st_set_geometry(NULL)
+
+
+############
+make_plots <- function(impact_zone,impact_data,hazard,pdf_name){
+  pdf(pdf_name, width=9, height=7)
+  impact<- impact_data %>% mutate(Date_=as.Date(Date,format="%d/%m/%Y"))
+  flood_date <- impact$Date_
+  description <- paste0(
+    "station: ", st, " \t",
+    "Zone: ", zones, "\n"
+  )
+  p1 <-  hazard %>% ggplot(aes(x = Date,y=Rainfall))  + geom_line(aes(colour = cum_days))+
+    geom_vline(xintercept = flood_date, linetype="dotted",  color = "red", size=1.5) +
+    #geom_text(x=flood_date, y=.75*max(hazard_sub$Rainfall), label=paste()"Scatter plot")
+    #geom_point(aes(y = value * flood), color = "red") + facet_wrap(~Lead_time) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          plot.title = element_text(hjust = 0.5, size = 10))+  ggtitle(description) +
+    theme(legend.position = c(0.06, 0.75))
+  p<-ggarrange(p1,impact_zone + rremove("x.text"),widths = c(2, 0.6),
+               labels = c("", "Location"),
+               ncol = 2, nrow = 1)
+  print(p)
+  dev.off() 
+}
+
 
 for (zones in unique(impact_data_df$Zone))
 {
@@ -172,7 +211,11 @@ for (zones in unique(impact_data_df$Zone))
   for (st  in unique(Hazard_rainfall$Name)){
     print(st)
     plot_data <- Hazard_rainfall %>%filter(Name == !!st)# %>% select(-year) %>%  rename(t0=dis,t_3days=dis_3day, t_7days=dis_7day) #%>%       gather('Lead_time','dis',-Date,-Name,-Zone)
-    #p<- ggplot(plot_data, aes(Date,dis)) + geom_line(aes(colour = Lead_time))
+    
+    plot_data <- plot_data %>% mutate(rain_t2= rollapplyr(Rainfall, width = 2, FUN = sum, partial = TRUE),
+                                      rain_t3 = rollapplyr(Rainfall, width = 3, FUN = sum, partial = TRUE),
+                                      rain_t5 = rollapplyr(Rainfall, width = 5, FUN = sum, partial = TRUE))%>% 
+      rename(rain_t0=Rainfall)%>% gather("cum_days","Rainfall",-Name,-Zone,-Date )
     
     impact_zone <- ggplot() +   geom_sf(data = admin2) + 
       geom_sf(data = admin2 %>% filter(Z_NAME ==!!zones),col ='red',fill = 'red') +
@@ -181,13 +224,22 @@ for (zones in unique(impact_data_df$Zone))
                                                                                                   axis.ticks = element_blank())
     
     
-    #p<- ggplot(plot_data, aes(Date,dis)) + geom_line(aes(colour = Lead_time))
-    make_zoomed_in_plots(impact_zone=impact_zone,impact=impact,hazard=plot_data,t_delta=100,pdf_name=paste0(getwd(),"/output/Ethiopia/Rainfall/",zones,st,"zoomed_in_per_flood_rain.pdf"))
+ 
+    ### uncoment the following line to save zoomed maps per event 
     
-    #print(p)
+    #make_zoomed_in_plots(impact_zone=impact_zone,impact=impact,hazard=plot_data,t_delta=100,pdf_name=paste0(getwd(),"/output/Ethiopia/Rainfall/",zones,st,"zoomed_in_per_flood_rain.pdf"))
+    
+    ### make plots per zone 
+    make_plots(impact_zone=impact_zone,impact=impact,hazard=plot_data,pdf_name=paste0(getwd(),"/output/Ethiopia/Rainfall/",zones,st,"_flood_rain.pdf"))
+    
+
+       #print(p)
     # p <- plot_data %>%  ggplot(aes(x = date, y = dis)) + geom_line() + geom_label(aes(y=dis, label=label)) +
     #ggtitle(station) + theme(plot.title = element_text(hjust = 0.5, size = 16))
     
+
+    
   }
 }
+ 
 

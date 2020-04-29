@@ -1,0 +1,13 @@
+name: catalog_view_Ethiopia
+title: catalog_view_Ethiopia
+username:
+account: 510typhoon
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2197696
+bundleId: 3074237
+url: https://510typhoon.shinyapps.io/catalog_view_Ethiopia/
+when: 1588026204.60586
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: data/Impact_Hazard_catalog.csv|data/prepped_data.csv

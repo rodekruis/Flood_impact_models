@@ -25,8 +25,11 @@ Input
 * River discharge/Rainfall data
 
 Output
-* plots for each events showing Impact and Hazard 
-* The outcome of the analysis is a hazard-impact catalog, which is based on historical impact data and GLOFAS hindcast
+* An Impact Hazard Catalog (A csv file with a daily record of flood impact and associated Hazard) 
+* a shyny app to easily visualize impact hazard catalog 
+![shyny app for visualizing impact-hazard catalog data) Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/hazard_impact_catalog.PNG)
+* plots for each events showing Impact and Hazard link(For EAP)
+* The outcome of this analysis is a hazard-impact catalog, which will be an input for the trigger table(next step)
 
 ### Hazard river discharge based on GLOFAS
 Example of impact-hazard analysis for a single event(hazard is based on glofas data) Ethiopia
