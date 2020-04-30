@@ -12,6 +12,8 @@ library(httr)
 library(zoo)
 library(grid)
 library(ggpubr)
+library(purrr)
+library(nngeo)
 #---------------------- setting -------------------------------
 Country="kenya"
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -22,6 +24,46 @@ settings <- country_settings
 url<- parse_url(url_geonode)
 
 #----------------------------function defination -------------
+
+prep_glofas_data <- function(){
+  # Read glofas files
+  
+  
+  # Read glofas files
+  glofas_files <- list.files(paste0(getwd(),'/input/Glofas/station_csv'),pattern = '.csv')
+  glofas_stations <- str_match(glofas_files, '^(?:[^_]*_){3}([^.]*)')[,2]
+  
+  #glofas_files1 <- str_match(glofas_files, '^(?:[^_]*_){2}([^.]*)')[,1]
+  #glofas_stations <-c('G1904','G1905','G1906')
+  
+  glofas_data <- map2_dfr(glofas_files, glofas_stations, function(filename,glofas_station) {
+    suppressMessages(
+      read.csv(file.path(paste0(getwd(),'/input/Glofas/station_csv') , filename))  %>%
+        mutate(time=as.Date(time),year=format(as.Date(time, format="%d/%m/%Y"),"%Y"),station2 = glofas_station,dis_3day=dis_3,dis_7day=dis_7) %>%
+        select(time,year,station,dis,dis_3day,dis_7day))})
+  
+  
+  glofas_data <- glofas_data %>%
+    select(time,year,station,dis,dis_3day,dis_7day)%>%
+    rename(date = time)  
+  
+  
+  
+  return(glofas_data)
+}
+
+fill_glofas_data <- function(glofas_data){
+  
+  glofas_filled <- tibble(date = seq(min(glofas_data$date), max(glofas_data$date), by = "1 day"))
+  glofas_filled <- merge(glofas_filled, tibble(station = unique(glofas_data$station)))
+  
+  glofas_filled <- glofas_filled %>%
+    left_join(glofas_data, by = c("station", "date")) %>%
+    arrange(station, date) %>%
+    mutate(dis = na.locf(dis),dis_3day = na.locf(dis_3day),dis_7day = na.locf(dis_7day))
+  glofas_filled<-glofas_filled %>% distinct(date,station,.keep_all = TRUE)
+  return(glofas_filled)
+}
 
 make_zoomed_in_plots <- function(impact_county,impact,hazard,t_delta=30,pdf_name){
   pdf(pdf_name, width=11, height=8.5)
@@ -85,6 +127,7 @@ make_zoomed_in_plots <- function(impact_county,impact,hazard,t_delta=30,pdf_name
   dev.off() 
 }
 
+
 #-------------------------read boundary shape files and stations----------------
 for (elm in  names(eval(parse(text=paste("settings$",Country,sep=""))))){
   url$query <- list(service = "WFS",version = "2.0.0",request = "GetFeature",
@@ -94,6 +137,17 @@ for (elm in  names(eval(parse(text=paste("settings$",Country,sep=""))))){
   data_read <- st_read(request)
   assign(elm,data_read)
 } 
+
+for (elm in  names(settings$general_basin)){
+  url$query <- list(service = "WFS",
+                    version = "2.0.0",
+                    request = "GetFeature",
+                    typename = eval(parse(text=paste("settings$general_basin","$",elm,sep=""))),
+                    outputFormat = "application/json")
+  request <- build_url(url)
+  data_read <- st_read(request)
+  assign(elm,data_read)
+} # download Geo Data 
 
 for (elm in  names(settings$general_geo)){
   url$query <- list(service = "WFS",
@@ -122,11 +176,9 @@ impact_data1_1 <- impact_data %>%
 # to do define impact columns in setting file in Ethiopian Case Crop.Damages, Lost.Cattle,Affected 
 impact_data_ts <- impact_data %>% mutate(Affected=as.numeric(p_impact),
                                          HH_impact=as.numeric(hh_impact),
-                                         human_impact=as.numeric(human_impa))%>% st_set_geometry(NULL)
+                                         human_impact=as.numeric(human_impa))#%>% st_set_geometry(NULL)
 
-
-
-impact_data_County<-impact_data_ts %>% group_by(County) %>%
+impact_data_County<-impact_data_ts %>% st_set_geometry(NULL) %>% group_by(County) %>%
   summarise(Affected = sum(Affected,na.rm=TRUE),HH_impact = sum(HH_impact,na.rm=TRUE),human_impact = sum(human_impact,na.rm=TRUE)) %>%
   ungroup()
 
@@ -137,17 +189,34 @@ impact_data_County<-impact_data_County %>%
 impact_data_County<-impact_data_County%>%st_set_geometry(impact_data_County$geometry)
 
 impact_data_County <- impact_data_County %>%filter(st_is_valid(geometry))
-impact_data_County <- st_transform(impact_data_County, st_crs(basins_africa))
+impact_data_County <- st_transform(impact_data_County, st_crs(4326))
+
 
 #---------------------- Hydro/mettrological stations in affected regions -------------------------------
 
-
-
+#---------------------- Hydro/mettrological stations in affected regions -------------------------------
 river_kenya <- st_intersection(rivers, admin1) %>% filter(UP_CELLS>1500) ##arrange(desc(UP_CELLS)) %>% dplyr::select(ARCID,geometry)
-
 kenya_glofas_st<-glofas_st %>% filter(CountryNam =='Kenya')%>% mutate(station=id) %>% select(station) 
 
-#glofas_stations_in_affected_areas<-st_intersection(kenya_glofas_st,impact_data_County) %>%   select(station,County) %>% distinct(station,County,.keep_all = TRUE)%>%    st_set_geometry(NULL)
+# based on nearest glogas station with in 50km from the impacted wareda 
+admin_centroid_pts <- impact_data_ts %>%mutate(cent_lon=map_dbl(geometry, ~st_centroid(.x)[[1]]), 
+                                                  cent_lat=map_dbl(geometry, ~st_centroid(.x)[[2]])) %>% as.data.frame() %>% distinct(County,.keep_all = TRUE)
+
+# convert to simple dataframe
+admin_centroid_pts <- st_as_sf(admin_centroid_pts, coords = c("cent_lon","cent_lat"), crs=4326, remove = FALSE) %>%  select(County)
+admin_centroid_pts = st_transform(admin_centroid_pts, 4326)
+kenya_glofas_st = st_transform(kenya_glofas_st, 4326)
+
+
+# find the first nearest neighbor rainfall station station for each centroid,  maximum 
+glofas_stations_in_affected_areas<-st_join(admin_centroid_pts, kenya_glofas_st, st_nn, k = 2,maxdist = 70000)%>% st_set_geometry(NULL)%>% select(County,station) %>% filter(station !='NA')
+glofas_stations_in_affected_areas<-glofas_stations_in_affected_areas  %>% distinct(County,station,.keep_all = TRUE)
+
+#NAM_stations_in_affected_areas<-st_join(admin_centroid_pts, NMA_stations, st_nn, k = 2,maxdist = 20000)%>% st_set_geometry(NULL)%>% select(County,station) %>% filter(station !='NA')
+#NAM_stations_in_affected_areas<-NAM_stations_in_affected_areas  %>% distinct(Zone,station,.keep_all = TRUE)
+
+#hyd_stations_in_affected_areas<-st_join(admin_centroid_pts, eth_hydro_st, st_nn, k = 2,maxdist = 30000)%>% st_set_geometry(NULL)%>% select(Zone,station) %>% filter(station !='NA')
+#hyd_stations_in_affected_areas<-hyd_stations_in_affected_areas  %>% distinct(County,station,.keep_all = TRUE)
 
 glofas_stations_in_affected_areas <- read.csv(paste0(getwd(),'/input/kenya_affected_area_stations.csv'),sep=";")
 
@@ -172,72 +241,39 @@ tm_shape(impact_data_County) + tm_polygons(col = "HH_impact", name='County',
 
 
 #---------------------- read glofas data hazard ------------------------------- 
-prep_glofas_data <- function(){
-  # Read glofas files
-  
-  
-  # Read glofas files
-  glofas_files <- list.files(paste0(getwd(),'/input/Glofas/station_csv'),pattern = '.csv')
-  glofas_stations <- str_match(glofas_files, '^(?:[^_]*_){3}([^.]*)')[,2]
-  
-  #glofas_files1 <- str_match(glofas_files, '^(?:[^_]*_){2}([^.]*)')[,1]
-  #glofas_stations <-c('G1904','G1905','G1906')
-  
-  glofas_data <- map2_dfr(glofas_files, glofas_stations, function(filename,glofas_station) {
-    suppressMessages(
-      read.csv(file.path(paste0(getwd(),'/input/Glofas/station_csv') , filename))  %>%
-        mutate(time=as.Date(time),year=format(as.Date(time, format="%d/%m/%Y"),"%Y"),station2 = glofas_station,dis_3day=dis_3,dis_7day=dis_7) %>%
-        select(time,year,station,dis,dis_3day,dis_7day))})
-  
-  
-  glofas_data <- glofas_data %>%
-    select(time,year,station,dis,dis_3day,dis_7day)%>%
-    rename(date = time)  
-  
-  
-  
-  return(glofas_data)
-}
 
 glofas_data<-prep_glofas_data() %>% filter (station %in% glofas_stations_in_affected_areas$station)
 
-fill_glofas_data <- function(glofas_data){
-  
-  glofas_filled <- tibble(date = seq(min(glofas_data$date), max(glofas_data$date), by = "1 day"))
-  glofas_filled <- merge(glofas_filled, tibble(station = unique(glofas_data$station)))
-  
-  glofas_filled <- glofas_filled %>%
-    left_join(glofas_data, by = c("station", "date")) %>%
-    arrange(station, date) %>%
-    mutate(dis = na.locf(dis),dis_3day = na.locf(dis_3day),dis_7day = na.locf(dis_7day))
-  glofas_filled<-glofas_filled %>% distinct(date,station,.keep_all = TRUE)
-  return(glofas_filled)
-}
-
 fill_glofas_data_<-fill_glofas_data(glofas_data)
 
-
-
 make_glofas_district_matrix <- function(glofas_data,glofas_stations_in_affected_areas) {
-  
-  #glofas_with_regions <- read_csv(paste0(getwd(),'/input/Eth_affected_area_stations.csv')) %>% mutate(station=st1)
-  #glofas_with_regions<- eth_glofas_st_zone %>% gather('st_id','station',-Z_NAME)  %>% filter(station != 'NA')
-  #glofas_with_regions<- Eth_affected_area_stations_ZONE %>% select(Z_NAME,station)
-  
   glofas_data <- glofas_data %>% 
     left_join(glofas_stations_in_affected_areas, by="station") %>% filter(County !='Na')  %>% # spread(station, dis_3day) %>%  mutate(district = toupper(Z_NAME)) %>%
     arrange(County, date)%>% rename(Date=date)  
   return(glofas_data)
 }
 
+glofas_district_matrix<- make_glofas_district_matrix(fill_glofas_data_,glofas_stations_in_affected_areas)
+
+#rainfall_district_matrix<- make_rainfall_district_matrix(rainfall_df,NAM_stations_in_affected_zones) %>% rename(rain_station=Name)
+#data_matrix<-rainfall_district_matrix %>% full_join(glofas_district_matrix %>% select(-year),by=c("Date","Zone"))
 
 
- glofas_district_matrix<- make_glofas_district_matrix(fill_glofas_data_,glofas_stations_in_affected_areas)
+impact_data_df<- impact_data_ts %>% 
+  st_set_geometry(NULL) %>% mutate(Date=as.Date(Date_st),flood=1)%>%
+  select("County","human_impa","hh_impact","p_impact","Affected","HH_impact","human_impact","Date","flood") 
+  
+Impact_hazard_catalog<- glofas_district_matrix  %>% 
+  full_join(impact_data_df %>%mutate(Date=as.Date(Date,format="%d/%m/%Y")),by=c("Date","County"))
+
+###### write Impact hazard catalog to file 
+write.table(Impact_hazard_catalog, file = "C:/Users/ATeklesadik/OneDrive - Rode Kruis/Documents/documents/Flood_impact_models/dashboard/catalog_view_kenya/data/Impact_Hazard_catalog.csv", append = FALSE, quote = TRUE, sep = ";",
+            eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+            col.names = TRUE, qmethod = c("escape", "double"),
+            fileEncoding = "")
 
 
-
-impact_data_df<- impact_data_ts #%>% st_set_geometry(NULL)
-
+#### plot graps for EAP
 
 for (zones in unique(impact_data_df$County))
   {
