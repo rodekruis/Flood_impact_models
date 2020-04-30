@@ -18,13 +18,16 @@ ui_tab_main <- tabItem(
   ),
   fluidRow(
     column(
-      width = 4,
-      sliderInput("swi_threshold", "Select SWI Threshold: ", min=10, max = 100, value=75),
+      width = 2,
+      # sliderInput("swi_threshold", "Select SWI Threshold: ", min=10, max = 100, value=75),
+      uiOutput("rainfall_slider"),
+      uiOutput("glofas_dropdown"),
+      uiOutput("glofas_slider"),
       uiOutput("result_html")
     ),
     column(
-      width = 8,
-      plotlyOutput("swi_plot")
+      width = 10,
+      plotlyOutput("rainfall_glofas_plot")
     )
   )
 )
@@ -32,7 +35,7 @@ ui_tab_main <- tabItem(
 body <- dashboardBody(
   # Loads CSS and JS from www/custom.css in
   tags$head(tags$link(rel = "stylesheet",
-                      type = "text/css", href = "custom.css")),
+                      type = "text/css", href = "custom_css.css")),
   tags$head(tags$script(src="main.js")),
   tabItems(
     ui_tab_main
@@ -46,8 +49,8 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Main Tab", tabName = "tab_main"),
       dateRangeInput('dateRange',
-                     label = 'Date range input: yyyy-mm-dd',
-                     start = '2007-01-01', end = '2020-01-01')
+                     label = 'Select date range:',
+                     start = min(df_impact_raw$date, na.rm=T), end = max(df_impact_raw$date, na.rm=T))
     )
   ),
   body
