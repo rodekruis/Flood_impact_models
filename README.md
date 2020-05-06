@@ -14,7 +14,7 @@ Output
 * Ethiopia Risk Analysis Example
 * ![Example of risk analysis for Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_annimation.gif)
 * Kenya Risk Analysis Example
-* ![Example of risk analysis for Kenya](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Kenya/kenya_risk.PNG)
+![Example of risk analysis for Kenya](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Kenya/kenya_impact.gif)
 
 ## 2. [Impact hazard catalogue](https://github.com/rodekruis/Flood_impact_models/blob/master/scripts/impact_hazard_catalog.R)
 A script which link impact (which was analyzed in understanding the risk part) with Hazard. Hydro-Met data will be used as a             proxy for discribing hazard.
