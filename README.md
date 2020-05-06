@@ -11,9 +11,11 @@ Input
 
 Output
 * The outcome of this analysis is a risk map, which is based on historical impact data 
-* Ethiopia Risk Analysis Example
-* ![Example of risk analysis for Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_annimation.gif)
-* Kenya Risk Analysis Example
+
+Ethiopia Risk Analysis Example
+![Example of risk analysis for Ethiopia](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Ethiopia/affected_annimation.gif)
+ 
+Kenya Risk Analysis Example
 ![Example of risk analysis for Kenya](https://github.com/rodekruis/Flood_impact_models/blob/master/output/Kenya/kenya_impact.gif)
 
 ## 2. [Impact hazard catalogue](https://github.com/rodekruis/Flood_impact_models/blob/master/scripts/impact_hazard_catalog.R)
