@@ -24,8 +24,9 @@ for (elm in  names(eval(parse(text=paste("settings$",Country,sep=""))))){
   request <- build_url(url)
   data_read <- st_read(request)
   assign(elm,data_read)
-} # download geo data
-# read river and catchment boundaries 
+} # download geo 
+
+# read glofas station
 for (elm in  names(settings$general_geo)){
   url$query <- list(service = "WFS",
                     version = "2.0.0",
@@ -36,6 +37,20 @@ for (elm in  names(settings$general_geo)){
   data_read <- st_read(request)
   assign(elm,data_read)
 } # download Geo Data 
+
+
+# read river and catchment boundaries 
+for (elm in  names(settings$general_basin)){
+  url$query <- list(service = "WFS",
+                    version = "2.0.0",
+                    request = "GetFeature",
+                    typename = eval(parse(text=paste("settings$general_basin","$",elm,sep=""))),
+                    outputFormat = "application/json")
+  request <- build_url(url)
+  data_read <- st_read(request)
+  assign(elm,data_read)
+} # download Geo Data 
+
 
 admin1 <- admin1 %>%filter(st_is_valid(geometry))
 impact_data <- impact_data %>%filter(st_is_valid(geometry))
@@ -56,6 +71,9 @@ impact_data_ts <- impact_data %>% mutate(Affected=as.numeric(p_impact),
 
 
 
+impact_data_County_ts<- admin1 %>%  mutate(County=ADM1_EN)  %>% select(County) %>%
+  left_join(impact_data_ts ,by="County")
+
 impact_data_County<-impact_data_ts %>% group_by(County) %>%
   summarise(Affected = sum(Affected,na.rm=TRUE),HH_impact = sum(HH_impact,na.rm=TRUE),human_impact = sum(human_impact,na.rm=TRUE)) %>%
   ungroup()
@@ -74,62 +92,50 @@ impact_data_County <- st_transform(impact_data_County, st_crs(basins_africa))
 #---------------------- annimation risk map -------------------------------
 tmap_mode(mode = "plot")
 
-m1<-tm_shape(admin3) + tm_borders(lwd = .5,col='#bdbdbd') +
-  tm_shape(impact_data1_w_ts) + tm_polygons(col = "Affected", name='W_NAME',
+m1<-tm_shape(admin1) + tm_borders(lwd = .5,col='#bdbdbd') +
+  tm_shape(impact_data_County_ts) + tm_polygons(col = "Affected", name='County',
                                         palette=c('#fef0d9','#fdd49e','#fdbb84','#fc8d59','#e34a33','#b30000'),
-                                        breaks=c(0,5,1000,5000,20000,50000,90000),colorNA=NULL,
-                                        labels=c('< 5','5 - 1k','1k - 5k','5k - 20k','20k - 50k','50k - 90k'),
+                                        breaks=c(0,5,10,50,200,500,900),colorNA=NULL,
+                                        labels=c('< 5','5 - 10','10 - 50','50 - 200','200 - 500','500 - 900'),
                                         title="No of Affected People",
                                         border.col = "black",lwd = 0.5,lyt='dotted')+
-  tm_facets(along = "year",free.coords = FALSE) +
+  tm_facets(along = "Date_year",free.coords = FALSE) +
   tm_format("World_wide")
 #save annimation to file 
-#tmap_animation(m1, filename="Ethiopia_impact.gif", width=1600, delay=60)
+tmap_animation(m1, filename="kenya_impact.gif", width=1600, delay=60)
 
 #---------------------- visualize risk data This are potential maps for EAP -------------------------------
-par(mfrow = c(1,3),mar=c(6.5, 4.5, 5.15, 2.25)+0.2)
-barplot(impact_data1_R$Affected, names = impact_data1_R$Region,
-        las = 3, cex.axis = 0.6, cex.names = 0.9, ylab = " Total Number of affected People", cex.lab = 0.9, space = 0,
-        col = "#fc9272",main = "Most affected Regions\n by #of affected people",cex.main = .7)
 
-barplot(impact_data1_R$Crop.Damages, names = impact_data1_R$Region,
-        las = 2, cex.axis = 0.6, cex.names = 0.9, ylab = "Total Area of Crope Damage", cex.lab = 0.9, space = 0,
-        col = "#fc9272",main = "Most affected Regions\n by Crope Damage", cex.main = .7)
 
-barplot(impact_data1_R$Lost.Cattle, names = impact_data1_R$Region,
-        las = 3, cex.axis = .6, cex.names = 0.9, ylab = "Total Number of Lost Cattles", cex.lab = 0.9, space = 0,
-        col = "#fc9272",main = "Most affected Regions\n by Lost Cattles", cex.main = .7)
-#plot the most affected woedas and zones ------------------------------- 
-
-impact_data1_Z_<-impact_data1_Z  %>%   top_n(20,wt=Affected)
+impact_data1_Z_<-impact_data_County  %>%   top_n(20,wt=Affected)
 #par(mar=c(11.5, 4.5, 13.15, 2.25)+0.2)
 par(mfrow = c(1,3),mar=c(6.5, 4.5, 5.15, 2.25)+0.2)
-barplot(impact_data1_Z_$Affected, names = impact_data1_Z_$Zone,
+barplot(impact_data1_Z_$Affected, names = impact_data1_Z_$County,
         las = 3, cex.axis = 1, cex.names = 1, ylab = "Total No of people affected", cex.lab = 1.7, space = 0,
-        col = "#fc9272",        main = "Most affected Zones \n by #of affected people",
+        col = "#fc9272",        main = "Most affected County \n by #of affected people",
         cex.main =1.7)
 
 
-barplot(impact_data1_Z_$Crop.Damages, names =impact_data1_Z_$Zone,
-        las = 3, cex.axis = 1.0, cex.names = 1, ylab = "Total Area of Crop damage", cex.lab = 1.7, space = 0,
-        col = "#fc9272",        main = "Most affected Zone \n by Crop Damage",
+barplot(impact_data1_Z_$HH_impact, names =impact_data1_Z_$County,
+        las = 3, cex.axis = 1.0, cex.names = 1, ylab = "Total HH affected", cex.lab = 1.7, space = 0,
+        col = "#fc9272",        main = "Most affected County \n by HH affected",
         cex.main =1.7)
 
-barplot(impact_data1_Z_$Lost.Cattle, names = impact_data1_Z_$Zone,
-        las = 3, cex.axis = 1.0, cex.names = 1.0, ylab = "Total No of Lost Cattles", cex.lab = 1.7, space = 0,
-        col = "#fc9272",        main = "Most affected Zone\n by Lost Cattles",
+barplot(impact_data1_Z_$human_impact, names = impact_data1_Z_$County,
+        las = 3, cex.axis = 1.0, cex.names = 1.0, ylab = "Total human impact", cex.lab = 1.7, space = 0,
+        col = "#fc9272",        main = "Most affected County\n by human impact",
         cex.main = 1.7)
-#---------------------- spatial plot of the most affected woedas and zones ------------------------------- 
+#---------------------- spatial plot of the most affected County and zones ------------------------------- 
 
 tmap_mode(mode = "view")
-tm_shape(impact_data1_w) + tm_polygons(col = "Affected", name='W_Name',
+tm_shape(impact_data_County) + tm_polygons(col = "Affected", name='County',
                                    palette=c('#fef0d9','#fdd49e','#fdbb84','#fc8d59','#e34a33','#b30000'),
                                    breaks=c(0,5,1000,5000,20000,50000,90000),colorNA=NULL,
                                    labels=c('< 5','5 - 1k','1k - 5k','5k - 20k','20k - 50k','50k - 90k'),
                                    title="No of Affected People",
                                    border.col = "black",lwd = 0.5,lyt='dotted')+
-  tm_shape(river_eth) + tm_lines(lwd=1,alpha = 0.5,col='#74a9cf') +
-  tm_shape(admin3) + tm_borders(lwd = .5,col='#bdbdbd') + #+   tm_format("NLD")
+  tm_shape(river_kenya) + tm_lines(lwd=1,alpha = 0.5,col='#74a9cf') +
+  tm_shape(admin1) + tm_borders(lwd = .5,col='#bdbdbd') + #+   tm_format("NLD")
   
 tm_layout(frame=F,scale = 1.5, legend.position = c(.78,.82), 
           legend.outside.size = 0.1,
@@ -143,59 +149,16 @@ tm_layout(frame=F,scale = 1.5, legend.position = c(.78,.82),
 
 
 # tmap
-tmap_mode(mode = "view")
-tm_shape(impact_data1_w) + tm_polygons(col = "Crop.Damages",name='W_Name',
-                                       palette=c('#fef0d9','#fdd49e','#fdbb84','#fc8d59','#e34a33','#b30000'),
-                                       breaks=c(0,5,50,200,1000,2000,4000),colorNA=NULL,
-                                       labels=c('< 5','5 - 50','50 - 200','200 - 1k','2k - 4k',' >4k'),
-                                       title="Area of Damaged Crops",
-                                       border.col = "black",lwd = 0.5,lyt='dotted')+
-  tm_shape(eth_admin3) + tm_borders(lwd = .5,col='#bdbdbd') +
-  tm_layout(frame=F,scale = 1.5, legend.position = c(.78,.82), 
-            legend.outside.size = 0.1,
-            legend.title.size = 2.0,
-            legend.height = 0.9,
-            legend.text.size = 1.6, 
-            legend.hist.size = 0.6) +tm_format("World_wide")
- 
-
-# tmap
-tmap_mode(mode = "view")
-tm_shape(impact_data1_w) + tm_polygons(col = "Lost.Cattle",name='W_Name',
-                                       palette=c('#fef0d9','#fdd49e','#fdbb84','#fc8d59','#e34a33','#b30000'),
-                                       breaks=c(0,5,500,2000,10000,20000,40000),colorNA=NULL,
-                                       labels=c('< 5','5 - 500','500 - 2k','2k - 10k','10k - 20k',' >40k'),
-                                       title="Total Lost Cattle",
-                                       border.col = "black",lwd = 0.5,lyt='dotted')+
-  tm_shape(eth_admin3) + tm_borders(lwd = .5,col='#bdbdbd') +
-  tm_layout(frame=F,scale = 1.5, legend.position = c(.78,.82), 
-            legend.outside.size = 0.1,
-            legend.title.size = 2.0,
-            legend.height = 0.9,
-            legend.text.size = 1.6, 
-            legend.hist.size = 0.6) +tm_format("World_wide")
 
 
 #map<- tmap_arrange(map1,map2,map3,ncol = 3,widths = c(.33,.33,.33))
 
 #---------------------- Hydro/mettrological stations in affected regions -------------------------------
 
-NAM_stations_in_affected_areas<-st_intersection(NMA_stations,impact_data1_Z) %>% filter(Gh_id !='Na')  %>% #select(Gh_id) %>%  
+
+glofas_stations_in_affected_areas<-st_intersection(kenya_glofas_st,impact_data1_Z_) %>% filter(id !='Na')  %>% select(id) %>%  
   st_set_geometry(NULL)
-
-#NAM_stations_in_affected_areas<-NMA_stations %>% filter(apply(st_within( x =NMA_stations ,y = impact_data1_Z, sparse = FALSE), 1, any))
-# filter(t_in='TRUE')
-NMA_stations_<- NMA_stations %>% filter(Gh_id %in% NAM_stations_in_affected_areas$Gh_id)
-
-hyd_stations_in_affected_areas<-st_intersection(eth_hydro_st,impact_data1_Z) %>% filter(SITE !='Na')  %>% #select(Gh_id) %>%  
-  st_set_geometry(NULL)
-eth_hydro_st_<- eth_hydro_st %>% filter(SITE %in% hyd_stations_in_affected_areas$SITE)
-
-
-
-glofas_stations_in_affected_areas<-st_intersection(eth_glofas_st,impact_data1_Z) %>% filter(id !='Na')  %>% select(id) %>%  
-  st_set_geometry(NULL)
-glofas_stations_in_affected_areas<- eth_glofas_st %>% filter(id %in% glofas_stations_in_affected_areas$id)
+glofas_stations_in_affected_areas<- kenya_glofas_st %>% filter(id %in% glofas_stations_in_affected_areas$id)
 
 
 #---------------------- vistualize stations and risk areas -------------------------------
